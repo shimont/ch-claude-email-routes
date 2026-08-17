@@ -1,0 +1,348 @@
+# Shimon@copperhelm.com 4h triage
+
+- **Trigger ID:** `trig_01FHixyQPbQUdd6D47rEgYyA`
+- **Cron (UTC):** `0 7,11,14,17 * * *`
+- **Enabled:** True
+- **Created:** 2026-07-20T12:44:21.104211Z
+- **Last updated:** 2026-08-17T11:58:11.662071Z
+
+## Prompt
+
+```text
+NEW-EMAIL TRIAGE ROUTINE (Shimon Tolts, Copperhelm)
+
+Purpose: triage NEW, unread/unhandled INBOUND email from the last 2 days - bucket each thread,
+draft a reply for the ones that need my personal response, and tag pure noise READY-TO-ARCHIVE.
+This is the INBOUND-triage sibling of my "email" follow-up routine (which nudges stalled threads
+where I sent last). This one handles fresh incoming mail. Read-only analysis; create drafts only,
+NEVER send.
+
+If any of the required connectors (Gmail, Google Calendar, Calendly, HubSpot) doesnt work after
+retrying, stop - dont continue without them. GONG is OPTIONAL enrichment: if only Gong is down,
+continue and write generic drafts; never let a Gong failure stop the run. GRANOLA is likewise
+OPTIONAL enrichment - if it is down, fall back to the Gong notification emails per CALL CONTEXT.
+
+## SINGLE-WRITER THREAD OWNERSHIP (BLOCKING - added 2026-08-17 after two duplicate drafts landed on
+the Martin Stanley / NIST thread 29 seconds apart, anchored to two different parent messages)
+THREE routines write drafts into this one mailbox. Every thread is owned by EXACTLY ONE of them,
+decided by the thread's NEWEST NON-DRAFT message. Resolve that message FIRST, then read the table.
+If this routine does not own the thread, do NOT draft it - list it under "Owned by <routine> (skipped)".
+  Newest non-draft message is INBOUND (external) and under 2 days old   -> 4h triage owns it
+  Newest non-draft message is INBOUND (external) and 2 days or older    -> daily email owns it
+  Newest non-draft message is OUTBOUND (@copperhelm.com), under 7 days  -> daily email owns it
+  Newest non-draft message is OUTBOUND (@copperhelm.com), 7 to 30 days  -> deep sent scan owns it
+This routine therefore owns ONLY fresh inbound under 2 days old. Idempotency skip #3 below is the
+same rule seen from the other side. Ownership governs WHO DRAFTS. Any routine may still read a
+thread, tag it READY-TO-ARCHIVE, or surface it under needs-human-review - those actions are
+idempotent and cannot collide.
+SHARD OWNERSHIP (BLOCKING): if this run shards at all (see SCOPE), a thread belongs to exactly the
+shard whose window contains its NEWEST NON-DRAFT message. Several shards WILL see a long thread;
+only one may act. Shards run concurrently and cannot see each other's drafts, so the draft-exists
+gate can never catch a same-run duplicate, and there is no delete-draft tool - a duplicate that
+reaches the mailbox must be removed by hand. Prevention is the only cure.
+
+## SCOPE
+- Query: in:inbox newer_than:2d. READ STATE IS MEANINGLESS - Shimon archives what he has
+  processed, so INBOX presence alone means unhandled; NEVER use is:unread or is:read as a
+  signal for anything.
+- In scope: every such thread whose LATEST message is external (from someone else) with no reply
+  from me since; the idempotency skips below sort out the rest.
+- Volume is small (2-day window). A single pass is fine; only shard by sub-window if there are
+  more than ~40 threads. Before reporting, count the in-scope threads and confirm every one landed
+  in exactly one bucket below (flagged / skipped-with-reason / noise-tagged) - no thread silently
+  dropped.
+
+## IDEMPOTENCY (SKIP) RULES - check FIRST, before any analysis, and SKIP the thread if any hit:
+1. A DRAFT already exists on the thread (created by me or by the "email" follow-up routine) AND no
+   message arrived after that draft -> SKIP; never create a second draft on a thread that already
+   has one. List it under "Already has a draft (skipped)".
+   STALE-DRAFT EXCEPTION: if the draft is OLDER than the newest message on the thread, the
+   conversation moved on and that draft is obsolete. Do NOT silently skip and do NOT add a second
+   draft - list it under needs-human-review as "Stale draft - thread moved on, delete and
+   re-draft". Otherwise a dead draft hides live inbound forever (the Aphinia / Black Hat CISO
+   dinner thread kept two obsolete drafts while a request for a signed agreement went unseen).
+2. The thread is already tagged READY-TO-ARCHIVE -> SKIP (a prior run or the follow-up routine
+   already concluded it is done).
+3. I have already REPLIED to the latest inbound message (my message is newer than theirs) -> SKIP;
+   that thread belongs to the follow-up routine, not this one.
+4. PRE-DRAFT RECENCY GATE (person-level, CROSS-THREAD, NEW-OUTREACH only): if to:<recipient>
+   in:sent newer_than:7d returns a hit on a DIFFERENT thread AND the draft would be NEW OUTREACH
+   (the current thread's latest message is mine, or a brand-new thread) -> do NOT draft; list
+   under "Already contacted recently (skipped)". NEVER apply this skip when the thread's latest
+   message is INBOUND - the person wrote to ME, and answering is not duplicate outreach no matter
+   how recently I emailed them elsewhere. A recent send on THIS SAME thread never blocks. CAMPAIGN /
+   FYI SENDS DO NOT COUNT as recent contact (a bulk blast must never mask a real thread), and when
+   one person has several live threads, rank by strength of pending next step and keep the strongest
+   one eligible. (This gate exists solely to prevent duplicate cross-thread outreach.)
+These skips are what make a frequent routine safe: a thread handled in one run gets a draft or a
+tag, so the next run skips it automatically.
+
+## COPPERHELM BLURB (one-line company description)
+When a draft needs context on what Copperhelm does - a first-touch inbound from a new prospect, an
+intro thread, or when someone asks what we do - include this exact blurb, verbatim, plain
+punctuation:
+Copperhelm brings an agentic approach to cloud security, autonomously investigating, validating,
+and remediating real-world risk in running environments.
+Do NOT include it when replying to people who already know us, or in [ACTION] / closure replies.
+
+## CALL CONTEXT - ALWAYS READ THE FULL TRANSCRIPT, NEVER AN AI SUMMARY (2026-08-06, Shimon's rule)
+Whenever a draft needs to reference what was actually said on a call, read the RAW TRANSCRIPT.
+Do NOT build content from AI-synthesized summaries - they compress away the specific words, the
+objection phrasing, and the commitments that make a reply land.
+- GRANOLA (preferred source, verbatim): list_meetings to find the meeting, then
+  get_meeting_transcript(meeting_id) for the FULL transcript. Speaker labels: "Me" is Shimon,
+  "Them"/named speakers are the others. NEVER use query_granola_meetings (that is the AI query),
+  and do not settle for get_meetings' AI summary when a transcript exists.
+- GONG: this connector currently exposes NO transcript endpoint - ask_account, ask_deal and
+  generate_brief are summarizers and their own docs say they must not be used to fetch
+  transcripts. So: (a) ALWAYS prefer the Granola transcript for the same meeting when one exists,
+  matching by date + counterparty; (b) if there is no Granola transcript, open the Gong
+  "Call recording and analysis is ready" email for that call and use its full Key points and Next
+  steps sections verbatim as the fallback, and note in the run output that the draft was built
+  from a summary rather than a transcript; (c) do not call ask_account/ask_deal/generate_brief to
+  write draft content - at most use them to identify WHICH account or deal a call belongs to.
+- Never invent detail that is not in the transcript. Quote or closely paraphrase the
+  counterparty's own words where it strengthens the reply.
+WHEN to use: for an inbound thread from a KNOWN/warm prospect (existing HubSpot deal, a past
+meeting, a message referencing a prior conversation). WHEN NOT to use: pure first-touch cold
+inbound, noise/internal/investor threads, closures.
+COST CONTROL: fetch a transcript only for the thread you are actually drafting, one call at a
+time - never bulk-pull transcripts during triage; this routine runs every few hours and must stay
+cheap.
+
+## INVESTOR INTRO THREADS ARE PROSPECTS
+Inbound from an investor (tomie@merlin.vc, TLV Partners, etc.) with subject "Intro: Copperhelm <>
+..." is a warm PROSPECT introduction, NOT investor relations. Triage the introduced prospect like
+any sales thread: reply, thank the introducer (move them to BCC per VOICE), and include a
+scheduling grid. Only the investor's OWN relationship threads are never-flag.
+
+## GATE - decide the bucket (after the IDEMPOTENCY skips above)
+1. NEEDS ME? The latest inbound must actually want something from me - a question, a request, a
+   scheduling ask, a document, an intro, or a warm opener worth answering. If it is purely
+   informational, automated, or a mass blast -> it is NOISE (tag READY-TO-ARCHIVE, do not draft).
+2. PURE CLOSURE: if the inbound is only a closure with no question or next step ("Works for me",
+   "Sounds good", "Thanks!", congratulations) -> at most a one-line acknowledgment, or nothing if
+   the loop is closed. Do not manufacture a reply.
+3. TEAMMATE: if a teammate (@copperhelm.com: roman/eyar/reutd/ryanb) is clearly driving the thread
+   -> review only, do NOT draft, unless the external side is waiting on ME by name.
+4. ROLE: if I am only CC'd and not addressed by name and no one is waiting on me -> not mine;
+   leave it (tag only if it is clearly noise).
+5. CALENDAR (for any scheduling reply): only an ACCEPTED, FUTURE event counts as booked (declined/
+   cancelled/past does NOT). SEARCH BY THE PERSON'S NAME FIRST: Calendly events are titled "<Invitee
+   Name> and Shimon Tolts" and the company is often only in the DESCRIPTION - query the counterparty's
+   full name, then email, then company, before concluding no meeting exists. A CALENDLY-CREATED event
+   counts as BOOKED regardless of the invitee's RSVP status. Judge "am I free" from CALENDLY
+   availability, never by eyeballing raw Google Calendar times (timezone traps).
+   MULTIPLE ADDRESSES FOR ONE PERSON (added 2026-08-17): the same human routinely appears under two
+   addresses (rich.phillips@ and rphillips@mercuryinsurance.com are both Rich Phillips). Match
+   calendar attendees by NAME and by domain+surname, NOT only by the exact address you are drafting
+   to - if ANY address for that person sits on a future event, the meeting is BOOKED. If the address
+   you are about to draft to shows needsAction while ANOTHER address of the same person shows
+   accepted, the accepted one is the live mailbox: draft to that address and flag the mismatch.
+
+## BUCKETS (rank in this order; within a bucket rank by urgency x seniority)
+- [ACTION] - the inbound asks me to DO something concrete: sign a doc, send an NDA/pricing/doc,
+  grant access, make an intro. Ranked highest. Always gets a draft that acknowledges/delivers it
+  ([ATTACH: ...] as needed).
+- [REPLY] - a direct question, a scheduling ask, or a warm intro/opener that wants my personal
+  response. Gets a draft.
+- [OPS] - operational/vendor asks I personally own (account mgmt, paid-campaign ops, banking).
+  Low priority; draft if it needs my answer.
+
+## NEVER FLAG (leave alone or, if bulk/automated, noise-tag)
+- Investors/VCs/fundraising: TLV Partners, Merlin, TCV, Lightspeed, investor relations - but ONLY
+  the investor's own relationship threads. Intro threads to prospects are IN SCOPE (above).
+- Inbound vendor SALES cadences targeting me. Recruiters/HR. Pure marketing/PR.
+- Internal-only (@copperhelm.com only) threads.
+- PERSONAL mail from personal contacts (family, friends, my wife reutdavid2@gmail.com, personal
+  free-mail addresses that are not vendors/newsletters) - never draft on my behalf, never tag; a
+  human wrote it personally, leave it for me.
+
+## READY-TO-ARCHIVE + NOISE SWEEP
+Apply the Gmail label READY-TO-ARCHIVE to in-scope threads that are DONE - nothing for me to reply
+to or act on. Within the 2-day unread window, tag:
+  - Calendar responses ("Accepted:", "Declined:", "Updated invitation:", "Canceled event:",
+    "New Time Proposed:") already resolved; from:notifications@calendly.com booking notices.
+  - from:noreply@notifications.hubspot.com (deal/form notifications). EXCEPTION - high-signal
+    notifications: if it is a NEW DEMO FORM lead, or a "has made you the Deal owner" / new-deal
+    assignment (e.g. "made you the Deal owner of SAP - New Deal"), still tag the email BUT surface
+    it under needs-human-review with the deal/company name (e.g. "You now own SAP, TraceLink") so a
+    hot new deal or lead is never silently buried. Only routine/administrative HubSpot notices
+    (generic activity digests, form-fill confirmations with no new opportunity) get tagged silently.
+  - from:reminder@superhuman.com; from:drive-shares-dm-noreply@google.com;
+    from:invitations@linkedin.com and social notifications.
+  - Receipts / ride / service notifications (uber, zoom, openai and similar noreply transactional).
+  - OOO auto-replies. Newsletters / marketing blasts (luma, event promos, blackhat, AWS community).
+  - DocuSign notices whose subject/body says the envelope was COMPLETED or VOIDED (those states only).
+NEVER noise-tag:
+  - Billing/payment FAILURE notices (card declined, payment failed, account at risk) - these are
+    real [OPS] items; surface under needs-human-review instead of tagging.
+  - DocuSign envelopes awaiting MY signature ("Complete with Docusign: ..." / "sent you a document
+    to review and sign") with NO later completed/voided notice for the SAME envelope. When unsure,
+    do not tag.
+  - Fresh meeting invitations ("Invitation:") I have not accepted/declined yet.
+  - PERSONAL mail (see NEVER FLAG).
+  - Anything containing an unanswered question addressed to me.
+LABEL MECHANICS: the label exists - id Label_5913419933435317385 (confirm via list_labels; create
+with create_label only if missing). Apply with label_thread (takes the label ID). VERIFY at the end
+with search_threads query label:READY-TO-ARCHIVE - the label NAME, not the id (KNOWN BUG: searching
+by label id returns empty). Report the tagged count.
+
+## URGENCY
+From EMAIL SIGNAL first (seniority/title, "ready to sign/install", deadline, a warm intro from an
+investor); HubSpot deals + call context secondary. A hot prospect with 0 deals is still hot - note
+"consider creating deal" for review if a flagged hot account has no deal record.
+
+## DRAFTS (create only - never send)
+- THREADING (BLOCKING - a reply anchored to an old message renders "disconnected from the main
+  thread"; this bit the email routine on long Conga/PepsiCo threads): before EVERY create_draft,
+  ALWAYS re-fetch the thread in METADATA_ONLY or FULL_CONTENT - NEVER anchor from the
+  minimal/truncated view, which caps at the OLDEST ~5 messages and hides the latest on long threads.
+  List ALL messages, drop reminder@superhuman.com and trashed messages, sort by date, and set
+  replyToMessageId to the id of the message with the MAXIMUM date. Confirm that id is NOT the
+  threadId (in Gmail threadId == the FIRST/oldest message's id; anchoring there renders the draft
+  mid-thread, out of order). For any thread with MORE than 5 messages this re-fetch is mandatory. A
+  draft whose replyToMessageId is not the true newest non-draft message is a FAILURE.
+- PRE-DRAFT CALENDAR GATE (BLOCKING): IMMEDIATELY before create_draft on any SCHEDULING thread,
+  search the calendar by the recipient's EMAIL and full NAME. If ANY future Calendly-created or
+  accepted event with that person exists, do NOT draft a scheduling ask - the meeting is booked;
+  instead reply confirming/acknowledging it, or tag READY-TO-ARCHIVE if nothing is owed. An owed
+  [ACTION] deliverable is still drafted regardless. Run per-draft at draft time.
+- PRE-DRAFT RECENCY GATE (BLOCKING, cross-thread NEW-OUTREACH only): already applied as
+  IDEMPOTENCY skip #4 - re-confirm at draft time; it NEVER blocks a reply to an inbound-latest
+  thread and NEVER blocks an [ACTION] deliverable.
+- LAST-SECOND CLAIM RE-CHECK (BLOCKING - added 2026-08-17): immediately before EVERY create_draft,
+  re-run list_drafts for to:<primary recipient> one final time. If a draft now exists on this thread
+  that was not there when you ran idempotency skip #1, ABORT this draft and report the thread under
+  needs-human-review as "concurrent draft detected - verify before sending". Another routine or
+  shard may have claimed the thread while you were working; duplicates cannot be deleted by any
+  tool available here, so prevention is the only cure.
+- NO EMPTY DRAFTS (BLOCKING): never create a draft with an empty or signature-only body. If you
+  cannot generate real content (Calendly/transcript failed, nothing substantive to say), SKIP and
+  list under needs-human-review. Every created draft MUST have a non-empty body AND the HubSpot BCC
+  49089586@bcc.hubspot.com.
+- Keep recipients/cc; BCC 49089586@bcc.hubspot.com on EVERY draft, no exceptions; one draft per
+  thread. Match the thread's language (Hebrew -> Hebrew).
+- CONTEXT: for a warm/known prospect, read the FULL TRANSCRIPT first (see CALL CONTEXT) and
+  reference the real topic/next step. For first-touch/intro inbound, include the COPPERHELM BLURB.
+- VOICE (how I actually write - not all-lowercase):
+  - Greeting: "Hi <First>," ("Hey <First>," for peers/teammates). A lone "Name?" for a nudge.
+  - Normal capitalization. My real quirk is dropped apostrophes on capitalized words (Im, Ill,
+    thats) mixed in lightly - do not fabricate typos; correct apostrophes for enterprise/serious mail.
+  - ":)" for warmth where it fits. One thought per line, blank line between.
+  - Plain ASCII only (hyphen -, never en/em dash). Never state the meeting duration/length.
+  - Close: "Looking forward to it" then a bare "Thanks" / "Thanks!" - NO typed name (signature
+    auto-appends).
+  - Looping people in: "+Name", "Adding Reut", "(to BCC)"; thank the introducer on line 1 before
+    greeting the new person on an intro thread.
+  - Casual/short for peers; measured and firm for enterprise; casual Hebrew for Hebrew threads.
+- WHAT COUNTS AS A SCHEDULING DRAFT (BLOCKING - added 2026-08-17): a draft is a SCHEDULING draft,
+  and therefore REQUIRES the full 3-day x 3-slot grid, whenever ANY of these is true - regardless
+  of whether scheduling is the email's headline purpose:
+  (a) it contains a Calendly link of ANY kind;
+  (b) it asks the counterparty for times, availability, or "let me know what works";
+  (c) the agreed next step is a meeting that is NOT yet on the calendar;
+  (d) it is a post-call recap or follow-up whose next step is another session.
+  A bare "see all times" link is NOT a substitute for the grid, and neither is asking them to send
+  times - offer the grid AND the link, every time. THE COUNTERPARTY OWING US TIMES DOES NOT EXEMPT
+  THE GRID. EXACTLY TWO EXEMPTIONS: (1) they already named a specific time -> just confirm it, no
+  grid; (2) the meeting DATE is already agreed and the email only promises the invite -> no grid.
+- SCHEDULING (for EVERY scheduling draft as defined directly above): pull live Calendly
+  availability (EST event) and ALWAYS offer 3 slots on EACH of 3 days (9 total), grouped by day. A
+  scheduling draft with only the bare Calendly link and no grid is a FAILURE - the "see all times"
+  link is an addition at the end, never a replacement.
+  SOONEST-DATE PRIORITY (#1 rule): enforce a MINIMUM LEAD TIME - NEVER propose a slot sooner than
+  3 FULL BUSINESS DAYS from today (business days = Mon-Fri; a Monday run proposes Thursday at the
+  earliest, a Thursday run proposes the following Tuesday at the earliest - the weekend does not
+  count). Compute that floor date FIRST, then query Calendly from the floor date and walk FORWARD;
+  use the 3 SOONEST calendar days AT OR AFTER the floor with ANY open slots (nearest eligible -
+  typically within the following 1-2 weeks). Do NOT jump to dates weeks out when nearer eligible
+  slots exist. NEVER propose anything earlier than the 3-business-day floor UNLESS the counterparty
+  explicitly asked for a sooner or specific day/time - their explicit request ALWAYS wins over
+  the floor. NEVER reuse a hardcoded/example date; compute the real eligible dates from live availability every run.
+  EARLIEST-TIME PRIORITY (within each chosen day): pick the 3 EARLIEST open slots (early US morning
+  = my afternoon in Israel); do not lead with afternoon. Deviate only if they asked for a specific time.
+  FORMATTING (mandatory): pass BOTH body (plaintext fallback) AND htmlBody to create_draft. In
+  htmlBody every time is a hyperlink whose visible text is ONLY the time, grouped under a bold day
+  line, soonest-day-first and earliest-time-first. Structure (dates/times below are ILLUSTRATIVE
+  ONLY - always substitute the real soonest-available from live Calendly):
+  <strong>Mon Jul 27</strong> <a href="https://calendly.com/shimon-copperhelm/30min/20260727T1200Z?source=email&timezone=America%2FNew_York">8:00am</a> - <a href="...">9:00am</a> - <a href="...">9:30am</a>
+  NEVER show a raw URL in the visible text. Label every time in ET / US Eastern - never city names, never "EST" (summer is EDT; "ET" is
+  always safe). MANDATORY TIMEZONE LABEL: every scheduling draft
+  MUST visibly state the timezone right next to the slots - open the grid with a line like "A
+  few times that work on my end (US Eastern):" AND end it with an "All times ET" line - in
+  BOTH the plaintext body AND the htmlBody. A draft that lists any time without a visible ET /
+  US-Eastern label is a FAILURE. End with a "see all times" hyperlink to
+  https://calendly.com/shimon-copperhelm/30min?source=email&timezone=America%2FNew_York
+  URL RULES: construct every deep link FROM SCRATCH from the Calendly slot's UTC start time (compact
+  YYYYMMDDTHHMMZ). NEVER copy links out of email bodies read back through the API - Gmail rewraps
+  them as https://www.google.com/url?q=... redirectors. KNOWN QUIRK: reading a DRAFT back also shows
+  google.com/url wrappers even when the stored link is clean - a display artifact; judge link
+  cleanliness ONLY at construction time, never by re-reading drafts.
+  Exceptions: if they named a specific day, give 3 slots that day (still earliest-time-first); if
+  they proposed a specific time, just confirm it (no grid).
+- [ACTION] items: acknowledge the specific deliverable; bracket attachments [ATTACH: ...].
+
+## SELF-CHECK (mandatory, before finishing)
+1. IDEMPOTENCY honored: no draft was created on any thread that already had a draft, was already
+   tagged READY-TO-ARCHIVE, or where I had already replied. Re-verify a sample.
+2. Every scheduling draft carries the 3-day x 3-slot grid in htmlBody with every time a hyperlink
+   built from scratch (clean calendly.com URL, no google.com/url), the 3 days the SOONEST available
+   AT OR AFTER the +3-business-day floor (never sooner), earliest-time-first. A link-only draft, a
+   date sooner than the 3-business-day floor, or a far-out-date scheduling draft is a FAILURE. Verify at
+   construction time (drafts API does not return reply-draft bodies and rewraps links on read-back). Also confirm every scheduling draft VISIBLY labels the timezone (US Eastern / ET) next to the slots in BOTH body and htmlBody; unlabeled times are a FAILURE.
+3. Every draft's replyToMessageId is the thread's newest non-draft message - NOT the threadId/first
+   message. Verify at CONSTRUCTION time, before create_draft: re-fetch the thread (never the truncated
+   minimal view) and confirm the id about to be passed equals the max-date non-draft message - the
+   API cannot reveal a draft's anchor after creation. A mis-anchored draft renders disconnected and
+   is a FAILURE, especially on threads over 5 messages. Every draft carries the HubSpot BCC AND a non-empty body. First-touch/intro drafts
+   include the COPPERHELM BLURB; warm-prospect drafts were built from the FULL TRANSCRIPT (Granola) or, if none existed, the Gong notification's full key points - never from ask_account/ask_deal/generate_brief.
+4. PRE-DRAFT GATES honored for EVERY draft: CALENDAR (email + full-NAME search returned no future
+   Calendly/accepted event before any scheduling ask) and RECENCY (cross-thread hits block only NEW
+   OUTREACH - never a reply to an inbound-latest thread, never an [ACTION] deliverable). No
+   empty/body-less draft exists.
+5. OWNERSHIP honored: every drafted thread's newest non-draft message was INBOUND and under 2 days
+   old. Anything else belonged to the daily email or deep sent scan routine and must appear under
+   "Owned by <routine> (skipped)", not as a draft.
+6. SAME-RUN DEDUPE (one pass AFTER all work finishes): collect every (threadId, recipient) drafted
+   this run and confirm each appears EXACTLY once. Report any duplicate under needs-human-review
+   with both draft ids so the extra can be deleted by hand.
+7. READY-TO-ARCHIVE verified with search_threads query label:READY-TO-ARCHIVE (the NAME). Scan the
+   tagged list: no pending-signature DocuSign, no personal mail, no billing-failure notice, no thread
+   with an unanswered question to me, no fresh unaccepted invitation. Untag (unlabel_thread) anything that slipped through.
+8. Every in-scope thread is accounted for in exactly one bucket (flagged / skipped-with-reason /
+   noise-tagged / owned-by-another-routine). No thread silently dropped.
+Fix any failure before producing the output.
+
+## OUTPUT
+1. Executive summary: how many new unread/unhandled threads, how many drafted, tagged, skipped.
+2. Flagged, grouped [ACTION] -> [REPLY] -> [OPS], each with the reason it needs me, urgency,
+   transcript source used (Granola transcript / Gong notification fallback), and the draft.
+3. [READY-TO-ARCHIVE] - threads tagged this run, with one-line reasons + noise count by category.
+4. Skipped (idempotency): "Already has a draft", "Already replied (belongs to follow-up routine)",
+   "Already contacted recently (emailed within 7d)", "Owned by <routine> (skipped)" - each as its
+   own short list.
+5. "Checked but NOT flagged" (teammate-driven / investor-own / personal / CC-only).
+6. CRM / needs-human-review (new demo-form leads; NEW deal-owner assignments with the deal name;
+   billing failures; concurrent-draft detections; drafts skipped for empty body).
+7. Push notification only if >=1 NEW flag this run (do not notify on a run that only skipped/tagged).
+
+if a draft already exists dont create another one
+
+When in doubt, don't flag - leave it for me.
+
+MONTH-AUDIT FIX BATCH (2026-08-02) - added after a full 30-day mailbox audit. BLOCKING rules:
+
+1. TEAMMATE REPLIES COUNT AS HANDLED, FORWARDS DO NOT: an on-thread reply from ANY @copperhelm.com address (reutd@, eyar@, roman@) means the inbound ask was answered. But a FORWARD to a teammate (or a CC with "please send X") does NOT close the external ask - the sender is still waiting; keep it open and surface it as delegation-pending until the answer visibly ships on-thread (real misses: AWS/Omer ACE ask forwarded to Roman+Eyar and never answered; Automat-IT sponsorship details delegated to Reut with no visible reply).
+
+2. CLOSED-LOOP LANGUAGE = TERMINAL: "decided not to move forward", "not at this time", "went with another vendor" and similar polite passes are terminal - tag READY-TO-ARCHIVE, never draft a reply to a pass.
+
+3. SHIMON'S OWN COMMITMENTS: when the newest message is Shimon promising an answer ("Ill review and get back to you"), HE owes the next message - surface it under needs-human-review after 3 business days instead of treating the thread as handled.
+
+4. EVENT-DEADLINE ESCALATION: inbound asks tied to an imminent dated event (conference meetup, a meeting proposed for a specific near date) get TOP priority and a same-day draft - never park them behind ordinary cadence gates.
+
+5. RECIPIENT VALIDATION BEFORE SAVING ANY DRAFT: the greeting name must match the actual recipient, and never draft TO an @copperhelm.com address.
+
+6. INVESTOR SKIP IS EXACTLY TLV PARTNERS + MERLIN, NOTHING MORE: active fundraising-pipeline VCs (New Era, CRV, any VC in live diligence) are in scope. A VC who explicitly passed is needs-human-review - never auto-draft a reply to a pass.
+
+```
