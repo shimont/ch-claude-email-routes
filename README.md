@@ -22,6 +22,10 @@ Backup and analysis of the Claude Routines that manage `shimon@copperhelm.com`.
 The prompts live in the Routine itself, not in this repo — editing a file here changes nothing on
 its own.
 
-All three Routines were created through the web UI, so the API rejects agent updates
-(`created via "http_api"` — agents may only update Routines they created). Changes must be applied
-by hand in the Routines UI. After applying any change, re-export so `routines/` matches live state.
+Changes must be applied by hand in the claude.ai Routines UI. Agents cannot do it: `update_trigger`
+refuses these Routines because they were created via the web UI (`created via "http_api"`), and
+recreating them with `create_trigger` produces Routines that carry no MCP connectors, so they run
+without Gmail. Both attempts are documented in
+[`proposed/CHANGES-2026-08-17.md`](proposed/CHANGES-2026-08-17.md#why-this-cant-be-automated).
+
+After applying any change, re-export so `routines/` matches live state.
