@@ -1,0 +1,64 @@
+
+## GATE - flag only if ALL pass
+1. SELF-REPLY / CROSS-THREAD:
+   a. Latest substantive message is EXTERNAL and I have not replied anywhere
+      -> flag normally (draft per bucket rules). EXCEPTION - pure closures: if the external
+      message is only a closure with no question or next step for me ("Works for me",
+      "Sounds good", "Thanks!", congratulations), do NOT draft a full reply - at most a
+      one-line acknowledgment, or nothing if the loop is closed and booked.
+   b. I sent/replied LAST -> branch on meeting state:
+      - Meeting BOOKED and already HAPPENED (past accepted event, or a Zoom/Gong
+        recording/recap exists) -> DONE, no action. Apply label READY-TO-ARCHIVE
+        and list under "Ready to archive." Do NOT draft.
+      - Meeting BOOKED and still UPCOMING (accepted FUTURE event) -> no action,
+        leave it; meeting is pending. EXCEPTION: if I still owe a deliverable on the
+        thread (NDA, doc, access), it is NOT done - keep it flagged [ACTION], do NOT tag,
+        and CREATE THE DRAFT that acknowledges/delivers it ([ATTACH: ...] as needed).
+        A booked meeting NEVER suppresses an [ACTION] draft.
+      - NO meeting booked (no accepted future event, no completed call) AND my last
+        message is 3+ BUSINESS DAYS old with no response (see definition above) -> DRAFT
+        a short scheduling follow-up that MUST include a fresh 3-day x 3-slot grid per
+        DRAFTS > SCHEDULING. NEVER send a bare-link-only nudge - the grid is mandatory in
+        every scheduling draft; the "see all times" link is an addition, not a replacement.
+        If my last message is FRESHER than 3 business days -> do NOT draft yet; list under
+        "Awaiting reply (too fresh to nudge)" so it is not silently dropped.
+        DEFERRAL EXCEPTION: if the counterparty's LAST reply explicitly deferred ("we'll get
+        back to you", "revisiting internally", "after <date/event>"), do NOT nudge on the
+        3-day cadence - wait 10 business days (or 2 business days past their stated date),
+        then send ONE gentle check-in; meanwhile list under "Deferred (slow cadence)".
+        AFTER that check-in is sent, the thread RETURNS to the normal 3-business-day cadence
+        and the standard nudge cap - a deferral delays the first check-in, it NEVER parks a
+        thread forever (real case: Cameron/PwC - his Jul 22 deferral plus the one Aug 2
+        check-in left the thread with no defined next step, and the NDA nudge never fired).
+2. TEAMMATE: if a teammate (@copperhelm.com: roman/eyar/reutd/ryanb) is clearly driving the
+   thread -> downgrade to "review only", do NOT draft, unless the external side is waiting on
+   me by name.
+3. CALENDAR: for scheduling, only an ACCEPTED, FUTURE event counts as booked (declined /
+   cancelled / past invite does NOT). SEARCH BY THE PERSON'S NAME FIRST: Calendly events are
+   titled "<Invitee Name> and Shimon Tolts" and the company often appears only in the event
+   DESCRIPTION - so query the counterparty's full name (e.g. "Imana Rucker"), then their
+   email, then the company name, before concluding no meeting exists. IMPORTANT: a
+   CALENDLY-CREATED event counts as BOOKED regardless of the invitee's RSVP status -
+   Calendly invitees self-book and often never click accept, so responseStatus needsAction
+   on a Calendly event still means booked. SELF-ORGANIZED EXCEPTION (fixes the Rich Phillips /
+   Mercury slip on 2026-08-03): an event SHIMON HIMSELF created/organized ALSO counts as
+   BOOKED regardless of the invitee's RSVP - he would not have put it on his own calendar
+   otherwise (a nudge draft was created for Rich while a self-created meeting for that very
+   day sat on the calendar with the invitee at needsAction, and the call happened). In short:
+   only a THIRD-PARTY invite needs an explicit accept; Calendly-created and self-organized
+   events are booked, period.
+  MULTIPLE ADDRESSES FOR ONE PERSON (added 2026-08-09): the same human routinely appears under two
+  addresses (rich.phillips@ and rphillips@mercuryinsurance.com are both Rich Phillips). Match
+  calendar attendees by NAME and by domain+surname, NOT only by the exact address you are drafting
+  to - if ANY address for that person sits on a future event, the meeting is BOOKED. And if the
+  address you are about to draft to shows needsAction while ANOTHER address of the same person
+  shows accepted on that event, the accepted one is the live mailbox: draft to that address and
+  flag the mismatch under needs-human-review. Repeated silence from an address that a clearly
+  engaged counterparty never replies to is evidence the address is wrong, not that they went dark. Check the calendar for events on ANY date - today, past few
+   days, and future - not just future ones: a meeting that just happened means the thread
+   state changed outside email (draft a recap/next-step instead of a nudge, or leave for
+   needs-human-review). Judge "am I free" from CALENDLY availability,
+   never by eyeballing raw Google Calendar times (timezone traps).
+4. ROLE: if I'm only CC'd and not addressed by name -> not mine.
+(DocuSign notification emails are not in this routine's scope; catch signatures owed from the
+human thread.)

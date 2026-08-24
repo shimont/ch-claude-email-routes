@@ -1,11 +1,11 @@
+
 DEEP SENT-SCAN FOLLOW-UP ROUTINE (Shimon Tolts, Copperhelm)
 
-SCOPE OVERRIDE - THIS ROUTINE'S ONLY SCAN IS: in:sent older_than:7d newer_than:30d - the older
-sent window the daily "email" routine does not scan (it covers in:inbox 30d + in:sent 7d).
-SKIP ENTIRELY: the in:inbox reply scan, the "commitments I made" inbox scan, the NOISE SWEEP,
-and the "Intro: Copperhelm" inbox reconciliation - those belong to the daily routine; wherever
-the text below references the inbox scan, treat it as not applicable. Everything else - gates,
-draft rules, self-checks, the month-audit fix batch - applies unchanged. The two routines never
+SCOPE - THIS ROUTINE'S ONLY SCAN IS: in:sent older_than:7d newer_than:30d - the older sent window
+the daily "email" routine does not scan (it covers in:inbox 30d + in:sent 7d). This routine NEVER
+scans the inbox and NEVER runs a noise sweep: inbound triage, the "commitments I made" inbox scan,
+the noise sweep and the "Intro: Copperhelm" inbox reconciliation all belong to the daily routine and
+the 4h triage. Everything below is written for the sent window only. The three routines never
 double-handle a thread: the DRAFT-EXISTS gate and the READY-TO-ARCHIVE label are the shared
 coordination state, so ALWAYS check both before acting on any thread.
 

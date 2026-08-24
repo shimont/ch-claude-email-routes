@@ -1,0 +1,52 @@
+
+## SELF-CHECK (mandatory, before finishing)
+1. Every scheduling draft - as defined by WHAT COUNTS AS A SCHEDULING DRAFT, including
+   follow-up NUDGES and POST-CALL RECAPS - carries the 3-day x 3-slot grid in
+   htmlBody with every time a hyperlink built from scratch (clean calendly.com URL, no
+   google.com/url). The 3 days are the SOONEST available dates that are AT LEAST 3 FULL BUSINESS
+   DAYS out (never sooner than the +3-business-day floor; nearest eligible days with open slots,
+   not dates weeks out when nearer slots exist), and within each day the slots are the EARLIEST
+   available times - unless the counterparty asked for a specific day/time. A link-only
+   scheduling draft, one proposing a date sooner than the 3-business-day floor, or one proposing
+   far-out dates while nearer eligible availability exists, is a FAILURE. Verify at construction time; the drafts API does not return
+   reply-draft bodies and rewraps links on read-back. Also confirm every scheduling draft VISIBLY labels the timezone (US Eastern / ET) next to the slots in BOTH body and htmlBody; unlabeled times are a FAILURE.
+   FINAL LINK SWEEP: re-read the body of EVERY draft created this run - if any contains a
+   calendly.com link with no day-grouped slot grid above it, that draft is a FAILURE; add the
+   grid before reporting.
+2. Every draft's replyToMessageId is the thread's newest non-draft message - NOT the
+   threadId / first message. Verify at CONSTRUCTION time, before create_draft: re-fetch the thread (METADATA_ONLY/FULL,
+   never the truncated minimal view) and confirm the id about to be passed equals the max-date
+   non-draft message - this is the ONLY possible checkpoint; the API cannot reveal a draft's
+   anchor after creation. A mis-anchored draft renders disconnected mid-thread and is a FAILURE,
+   especially on threads over 5 messages. Every draft carries the HubSpot BCC AND a non-empty body (no
+   signature-only shells). First-touch/intro drafts include the COPPERHELM BLURB verbatim;
+   warm-prospect drafts were built from the FULL TRANSCRIPT (Granola) or, if none existed, the Gong notification's full key points - never from ask_account/ask_deal/generate_brief.
+3. READY-TO-ARCHIVE: verify with search_threads query label:READY-TO-ARCHIVE (the NAME -
+   searching by label id silently returns empty) and report the tagged count.
+4. Scan the tagged list one final time: no pending-signature DocuSign, no personal mail, no
+   thread with an owed deliverable. Untag (unlabel_thread) anything that slipped through.
+5. Every [ACTION] flag has a corresponding draft (an owed deliverable without a draft is a
+   failure). Every thread listed "awaiting reply (too fresh)" was actually under 3 full
+   weekdays of silence - recount using the BUSINESS DAYS definition.
+6. PRE-DRAFT GATES honored for EVERY draft created:
+   - CALENDAR: a calendar search by the recipient's EMAIL and full NAME returned NO future
+     Calendly/accepted event. Re-verify a sample of drafted recipients by name (including
+     anyone previously wrongly drafted, e.g. Imana Rucker / Foresight). Any booked prospect must have NO draft and be tagged READY-TO-ARCHIVE instead.
+   - RECENCY (cross-thread only): for every drafted recipient, to:<recipient> in:sent
+     newer_than:7d returned NO hit on a DIFFERENT thread (a recent send on the SAME thread being
+     nudged is allowed - that self-sent-last nudge must NOT be delayed to 7 days). If I emailed
+     that person in the last 7 days on a DIFFERENT thread (e.g. Brad Doctor / First Advantage),
+     there must be NO new draft; it belongs under "Already contacted recently (skipped)" -
+     except [ACTION] deliverable drafts, which are exempt from this gate.
+   - No empty/body-less draft exists.
+7. SHARD RECONCILIATION: confirm the shard completeness check passed - the global
+   in:sent older_than:7d newer_than:30d total, counted by paging to exhaustion, reconciles with the
+   shards' combined processed count. Report the reconciliation explicitly in the output. If it
+   fails, re-process the gap before reporting.
+8. SAME-RUN DEDUPE (one single-shard pass AFTER all shards finish): collect every (threadId,
+   recipient) drafted this run and confirm each appears EXACTLY once. Parallel shards cannot see
+   each other's drafts - a draft is not in:sent and sits on the same thread - so this final pass is
+   the ONLY place a same-run duplicate can be caught (two drafts each landed on the Beville/Amazon
+   and Aphinia threads minutes apart exactly this way). Report any duplicate under
+   needs-human-review with both draft ids so the extra can be deleted.
+Fix any failure before producing the output.

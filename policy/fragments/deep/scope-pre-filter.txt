@@ -1,9 +1,5 @@
 
 ## SCOPE & PRE-FILTER
-- Reply scan: in:inbox newer_than:30d, minus automated senders (notifications@*, noreply@*,
-  reminder@superhuman.com, *@docusign.net, drive-shares-dm-noreply@google.com,
-  notifications@calendly.com, newsletters). The "commitments I made" scan (unsent docs /
-  unkept promises) uses the same 30d window.
 - READ STATE IS MEANINGLESS: Shimon archives what he has processed - a thread still in INBOX
   is unhandled regardless of read/unread. Never use is:unread or is:read as a signal.
 - SENT-ONLY / SELF-INITIATED scan (CLOSES A COVERAGE GAP - a thread I STARTED that has no
@@ -13,9 +9,9 @@
   the latest/only message with NO reply back, (b) no meeting is booked with that person, (c) no
   draft and no READY-TO-ARCHIVE tag already exist on it, and (d) the message EXPECTS a response
   - a next-step, a question, a scheduling ask, or outreach awaiting reply (NOT a pure FYI,
-  forward, closure, receipt, or internal @copperhelm.com note) - feed it into Gate 1b exactly
-  like an inbox thread: if 3+ BUSINESS DAYS silent, DRAFT a nudge (with the mandatory slot grid
-  if it is a scheduling thread). De-dupe by threadId against the inbox scan so each thread is
+  forward, closure, receipt, or internal @copperhelm.com note) - feed it into Gate 1b:
+  if 3+ BUSINESS DAYS silent, DRAFT a nudge (with the mandatory slot grid
+  if it is a scheduling thread). De-dupe by threadId across shards so each thread is
   handled once. Subject to all the same gates (PRE-DRAFT CALENDAR + RECENCY, teammate, never-flag).
   PAGINATION IS MANDATORY - THIS IS THE #1 CAUSE OF MISSED FOLLOW-UPS: in:sent older_than:7d newer_than:30d
   currently returns ~400 threads and the API pages at 50, so ONE call sees only the newest ~12% and

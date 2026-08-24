@@ -184,7 +184,7 @@ before drafting, never assume.
    needs-human-review). Judge "am I free" from CALENDLY availability,
    never by eyeballing raw Google Calendar times (timezone traps).
 4. ROLE: if I'm only CC'd and not addressed by name -> not mine.
-(DocuSign notification emails stay skipped in the reply scan; catch signatures owed from the
+(DocuSign notification emails are not in this routine's scope; catch signatures owed from the
 human thread.)
 
 ## READY-TO-ARCHIVE TAGGING
@@ -206,7 +206,6 @@ returns empty even when threads are tagged; only the name form works. Report the
 count in the output; if 0, state that explicitly and explain why.
 Do NOT tag investor/internal threads with live discussion. Tagging is the routine's job; the
 actual archive stays a human action. List every tagged thread under "Ready to archive".
-
 
 ## BUCKETS (rank in this order; within a bucket rank by urgency x age)
 - [ACTION] - I owe a deliverable, not a reply: sign a doc, send an NDA, grant access, make
