@@ -1,0 +1,10 @@
+
+## INVITES AND PERSONAL FYI (output-only - never draft, never auto-accept)
+- UNANSWERED MEETING INVITATIONS: inbound meeting invites (subject 'Invitation:' or carrying an
+  .ics) where Shimon is still needsAction on the calendar and the meeting is under 5 days away ->
+  surface under needs-human-review with the meeting date (real cases 2026-08-08: TPG ICP review
+  for Aug 10 still unaccepted; TLB Q4 catch-up invite with no calendar event at all). NEVER
+  accept or decline on Shimon's behalf.
+- PERSONAL DEADLINES: personal mail is never drafted, tagged, or archived by the routine, but a
+  personal message carrying an explicit deadline gets a one-line FYI in the output (real case:
+  afterschool registration closing Aug 12).

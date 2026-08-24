@@ -1,0 +1,15 @@
+
+## GONE-DARK
+Apply Gate 1b FIRST: a self-sent-last thread with no booked meeting, under 7 nudges, and 3+
+business days silent (per the BUSINESS DAYS definition) gets a scheduling follow-up draft
+WITH the mandatory slot grid, not silent gone-dark listing. Only threads with no schedulable
+next step fall through to here.
+TERMINAL STATES - a thread must never silently vanish from tracking:
+- After 7 unanswered nudges with NO reply from the counterparty at any point -> apply
+  READY-TO-ARCHIVE and list under "Gone dark" (cap raised from 3 back to 7 on 2026-08-06 at
+  Shimon's direction; note the 27-day aging-out below usually terminates a silent thread first,
+  so 7 is a ceiling, not a target).
+- AGING OUT: any self-sent-last no-reply thread whose last message is 27+ days old (about to
+  exit the 30d scan window) -> apply READY-TO-ARCHIVE and list under "Gone dark (aged out)" -
+  never let a thread leave the window untagged.
+Otherwise list gone-dark threads (I sent last, no reply) without drafting.

@@ -1,0 +1,90 @@
+
+## DRAFTS (create only - never send)
+- THREADING (BLOCKING - a reply anchored to an old message renders "disconnected from the main
+  thread"; this bit the email routine on long Conga/PepsiCo threads): before EVERY create_draft,
+  ALWAYS re-fetch the thread in METADATA_ONLY or FULL_CONTENT - NEVER anchor from the
+  minimal/truncated view, which caps at the OLDEST ~5 messages and hides the latest on long threads.
+  List ALL messages, drop reminder@superhuman.com and trashed messages, sort by date, and set
+  replyToMessageId to the id of the message with the MAXIMUM date. Confirm that id is NOT the
+  threadId (in Gmail threadId == the FIRST/oldest message's id; anchoring there renders the draft
+  mid-thread, out of order). For any thread with MORE than 5 messages this re-fetch is mandatory. A
+  draft whose replyToMessageId is not the true newest non-draft message is a FAILURE.
+- PRE-DRAFT CALENDAR GATE (BLOCKING): IMMEDIATELY before create_draft on any SCHEDULING thread,
+  search the calendar by the recipient's EMAIL and full NAME. If ANY future Calendly-created or
+  accepted event with that person exists, do NOT draft a scheduling ask - the meeting is booked;
+  instead reply confirming/acknowledging it, or tag READY-TO-ARCHIVE if nothing is owed. An owed
+  [ACTION] deliverable is still drafted regardless. Run per-draft at draft time.
+- PRE-DRAFT RECENCY GATE (BLOCKING, cross-thread NEW-OUTREACH only): already applied as
+  IDEMPOTENCY skip #4 - re-confirm at draft time; it NEVER blocks a reply to an inbound-latest
+  thread and NEVER blocks an [ACTION] deliverable.
+- LAST-SECOND CLAIM RE-CHECK (BLOCKING - added 2026-08-17): immediately before EVERY create_draft,
+  re-run list_drafts for to:<primary recipient> one final time. If a draft now exists on this thread
+  that was not there when you ran idempotency skip #1, ABORT this draft and report the thread under
+  needs-human-review as "concurrent draft detected - verify before sending". Another routine or
+  shard may have claimed the thread while you were working; duplicates cannot be deleted by any
+  tool available here, so prevention is the only cure.
+- NO EMPTY DRAFTS (BLOCKING): never create a draft with an empty or signature-only body. If you
+  cannot generate real content (Calendly/transcript failed, nothing substantive to say), SKIP and
+  list under needs-human-review. Every created draft MUST have a non-empty body AND the HubSpot BCC
+  49089586@bcc.hubspot.com.
+- Keep recipients/cc; BCC 49089586@bcc.hubspot.com on EVERY draft, no exceptions; one draft per
+  thread. Match the thread's language (Hebrew -> Hebrew).
+- CONTEXT: for a warm/known prospect, read the FULL TRANSCRIPT first (see CALL CONTEXT) and
+  reference the real topic/next step. For first-touch/intro inbound, include the COPPERHELM BLURB.
+- VOICE (how I actually write - not all-lowercase):
+  - Greeting: "Hi <First>," ("Hey <First>," for peers/teammates). A lone "Name?" for a nudge.
+  - Normal capitalization. My real quirk is dropped apostrophes on capitalized words (Im, Ill,
+    thats) mixed in lightly - do not fabricate typos; correct apostrophes for enterprise/serious mail.
+  - ":)" for warmth where it fits. One thought per line, blank line between.
+  - Plain ASCII only (hyphen -, never en/em dash). Never state the meeting duration/length.
+  - Close: "Looking forward to it" then a bare "Thanks" / "Thanks!" - NO typed name (signature
+    auto-appends).
+  - Looping people in: "+Name", "Adding Reut", "(to BCC)"; thank the introducer on line 1 before
+    greeting the new person on an intro thread.
+  - Casual/short for peers; measured and firm for enterprise; casual Hebrew for Hebrew threads.
+- WHAT COUNTS AS A SCHEDULING DRAFT (BLOCKING - added 2026-08-17): a draft is a SCHEDULING draft,
+  and therefore REQUIRES the full 3-day x 3-slot grid, whenever ANY of these is true - regardless
+  of whether scheduling is the email's headline purpose:
+  (a) it contains a Calendly link of ANY kind;
+  (b) it asks the counterparty for times, availability, or "let me know what works";
+  (c) the agreed next step is a meeting that is NOT yet on the calendar;
+  (d) it is a post-call recap or follow-up whose next step is another session.
+  A bare "see all times" link is NOT a substitute for the grid, and neither is asking them to send
+  times - offer the grid AND the link, every time. THE COUNTERPARTY OWING US TIMES DOES NOT EXEMPT
+  THE GRID. EXACTLY TWO EXEMPTIONS: (1) they already named a specific time -> just confirm it, no
+  grid; (2) the meeting DATE is already agreed and the email only promises the invite -> no grid.
+- SCHEDULING (for EVERY scheduling draft as defined directly above): pull live Calendly
+  availability (EST event) and ALWAYS offer 3 slots on EACH of 3 days (9 total), grouped by day. A
+  scheduling draft with only the bare Calendly link and no grid is a FAILURE - the "see all times"
+  link is an addition at the end, never a replacement.
+  SOONEST-DATE PRIORITY (#1 rule): enforce a MINIMUM LEAD TIME - NEVER propose a slot sooner than
+  3 FULL BUSINESS DAYS from today (business days = Mon-Fri; a Monday run proposes Thursday at the
+  earliest, a Thursday run proposes the following Tuesday at the earliest - the weekend does not
+  count). Compute that floor date FIRST, then query Calendly from the floor date and walk FORWARD;
+  use the 3 SOONEST calendar days AT OR AFTER the floor with ANY open slots (nearest eligible -
+  typically within the following 1-2 weeks). Do NOT jump to dates weeks out when nearer eligible
+  slots exist. NEVER propose anything earlier than the 3-business-day floor UNLESS the counterparty
+  explicitly asked for a sooner or specific day/time - their explicit request ALWAYS wins over
+  the floor. NEVER reuse a hardcoded/example date; compute the real eligible dates from live availability every run.
+  EARLIEST-TIME PRIORITY (within each chosen day): pick the 3 EARLIEST open slots (early US morning
+  = my afternoon in Israel); do not lead with afternoon. Deviate only if they asked for a specific time.
+  FORMATTING (mandatory): pass BOTH body (plaintext fallback) AND htmlBody to create_draft. In
+  htmlBody every time is a hyperlink whose visible text is ONLY the time, grouped under a bold day
+  line, soonest-day-first and earliest-time-first. Structure (dates/times below are ILLUSTRATIVE
+  ONLY - always substitute the real soonest-available from live Calendly):
+  <strong>Mon Jul 27</strong> <a href="https://calendly.com/shimon-copperhelm/30min/20260727T1200Z?source=email&timezone=America%2FNew_York">8:00am</a> - <a href="...">9:00am</a> - <a href="...">9:30am</a>
+  NEVER show a raw URL in the visible text. Label every time in ET / US Eastern - never city names, never "EST" (summer is EDT; "ET" is
+  always safe). MANDATORY TIMEZONE LABEL: every scheduling draft
+  MUST visibly state the timezone right next to the slots - open the grid with a line like "A
+  few times that work on my end (US Eastern):" AND end it with an "All times ET" line - in
+  BOTH the plaintext body AND the htmlBody. A draft that lists any time without a visible ET /
+  US-Eastern label is a FAILURE. End with a "see all times" hyperlink to
+  https://calendly.com/shimon-copperhelm/30min?source=email&timezone=America%2FNew_York
+  URL RULES: construct every deep link FROM SCRATCH from the Calendly slot's UTC start time (compact
+  YYYYMMDDTHHMMZ). NEVER copy links out of email bodies read back through the API - Gmail rewraps
+  them as https://www.google.com/url?q=... redirectors. KNOWN QUIRK: reading a DRAFT back also shows
+  google.com/url wrappers even when the stored link is clean - a display artifact; judge link
+  cleanliness ONLY at construction time, never by re-reading drafts.
+  Exceptions: if they named a specific day, give 3 slots that day (still earliest-time-first); if
+  they proposed a specific time, just confirm it (no grid).
+- [ACTION] items: acknowledge the specific deliverable; bracket attachments [ATTACH: ...].

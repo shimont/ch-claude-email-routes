@@ -1,0 +1,19 @@
+
+## SINGLE-WRITER THREAD OWNERSHIP (BLOCKING - added 2026-08-17 after two duplicate drafts landed on
+the Martin Stanley / NIST thread 29 seconds apart, anchored to two different parent messages)
+THREE routines write drafts into this one mailbox. Every thread is owned by EXACTLY ONE of them,
+decided by the thread's NEWEST NON-DRAFT message. Resolve that message FIRST, then read the table.
+If this routine does not own the thread, do NOT draft it - list it under "Owned by <routine> (skipped)".
+  Newest non-draft message is INBOUND (external) and under 2 days old   -> 4h triage owns it
+  Newest non-draft message is INBOUND (external) and 2 days or older    -> daily email owns it
+  Newest non-draft message is OUTBOUND (@copperhelm.com), under 7 days  -> daily email owns it
+  Newest non-draft message is OUTBOUND (@copperhelm.com), 7 to 30 days  -> deep sent scan owns it
+This routine therefore owns ONLY fresh inbound under 2 days old. Idempotency skip #3 below is the
+same rule seen from the other side. Ownership governs WHO DRAFTS. Any routine may still read a
+thread, tag it READY-TO-ARCHIVE, or surface it under needs-human-review - those actions are
+idempotent and cannot collide.
+SHARD OWNERSHIP (BLOCKING): if this run shards at all (see SCOPE), a thread belongs to exactly the
+shard whose window contains its NEWEST NON-DRAFT message. Several shards WILL see a long thread;
+only one may act. Shards run concurrently and cannot see each other's drafts, so the draft-exists
+gate can never catch a same-run duplicate, and there is no delete-draft tool - a duplicate that
+reaches the mailbox must be removed by hand. Prevention is the only cure.

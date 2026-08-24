@@ -1,0 +1,11 @@
+
+## SELF-ADDRESSED NOTES = leads I met
+Notes I email/CC to myself (e.g. "Follow up with X", "Screenshot ... talk to") are leads I
+met in person -> draft a warm "great to connect + schedule" email to that lead (include the
+COPPERHELM BLURB - it is a first touch). Resolve their email from HubSpot / prior mail. Then
+run the PRE-DRAFT RECENCY GATE (see DRAFTS) on that email BEFORE drafting - if I already
+emailed this lead in the last 7 days (very common: I met them and mailed them the same week,
+so a self-note plus a real send both exist), do NOT draft a duplicate; tag the self-note
+READY-TO-ARCHIVE and move on. If the email can't be identified (no email, garbled name,
+uninterpretable screenshot, too vague) -> drop it silently, never guess an address. Once the
+outreach draft exists, tag the self-note thread itself READY-TO-ARCHIVE.

@@ -1,0 +1,9 @@
+
+## BUCKETS (rank in this order; within a bucket rank by urgency x seniority)
+- [ACTION] - the inbound asks me to DO something concrete: sign a doc, send an NDA/pricing/doc,
+  grant access, make an intro. Ranked highest. Always gets a draft that acknowledges/delivers it
+  ([ATTACH: ...] as needed).
+- [REPLY] - a direct question, a scheduling ask, or a warm intro/opener that wants my personal
+  response. Gets a draft.
+- [OPS] - operational/vendor asks I personally own (account mgmt, paid-campaign ops, banking).
+  Low priority; draft if it needs my answer.

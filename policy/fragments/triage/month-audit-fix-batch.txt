@@ -1,0 +1,14 @@
+
+MONTH-AUDIT FIX BATCH (2026-08-02) - added after a full 30-day mailbox audit. BLOCKING rules:
+
+1. TEAMMATE REPLIES COUNT AS HANDLED, FORWARDS DO NOT: an on-thread reply from ANY @copperhelm.com address (reutd@, eyar@, roman@) means the inbound ask was answered. But a FORWARD to a teammate (or a CC with "please send X") does NOT close the external ask - the sender is still waiting; keep it open and surface it as delegation-pending until the answer visibly ships on-thread (real misses: AWS/Omer ACE ask forwarded to Roman+Eyar and never answered; Automat-IT sponsorship details delegated to Reut with no visible reply).
+
+2. CLOSED-LOOP LANGUAGE = TERMINAL: "decided not to move forward", "not at this time", "went with another vendor" and similar polite passes are terminal - tag READY-TO-ARCHIVE, never draft a reply to a pass.
+
+3. SHIMON'S OWN COMMITMENTS: when the newest message is Shimon promising an answer ("Ill review and get back to you"), HE owes the next message - surface it under needs-human-review after 3 business days instead of treating the thread as handled.
+
+4. EVENT-DEADLINE ESCALATION: inbound asks tied to an imminent dated event (conference meetup, a meeting proposed for a specific near date) get TOP priority and a same-day draft - never park them behind ordinary cadence gates.
+
+5. RECIPIENT VALIDATION BEFORE SAVING ANY DRAFT: the greeting name must match the actual recipient, and never draft TO an @copperhelm.com address.
+
+6. INVESTOR SKIP IS EXACTLY TLV PARTNERS + MERLIN, NOTHING MORE: active fundraising-pipeline VCs (New Era, CRV, any VC in live diligence) are in scope. A VC who explicitly passed is needs-human-review - never auto-draft a reply to a pass.

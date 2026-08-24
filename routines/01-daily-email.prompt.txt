@@ -1,13 +1,4 @@
-
-DEEP SENT-SCAN FOLLOW-UP ROUTINE (Shimon Tolts, Copperhelm)
-
-SCOPE - THIS ROUTINE'S ONLY SCAN IS: in:sent older_than:7d newer_than:30d - the older sent window
-the daily "email" routine does not scan (it covers in:inbox 30d + in:sent 7d). This routine NEVER
-scans the inbox and NEVER runs a noise sweep: inbound triage, the "commitments I made" inbox scan,
-the noise sweep and the "Intro: Copperhelm" inbox reconciliation all belong to the daily routine and
-the 4h triage. Everything below is written for the sent window only. The three routines never
-double-handle a thread: the DRAFT-EXISTS gate and the READY-TO-ARCHIVE label are the shared
-coordination state, so ALWAYS check both before acting on any thread.
+FOLLOW-UP ROUTINE (Shimon Tolts, Copperhelm)
 
 If any of the required connectors (Gmail, Google Calendar, Calendly, HubSpot) doesnt work
 after retrying, stop - dont continue without them. GONG is OPTIONAL enrichment: if only Gong
@@ -29,9 +20,8 @@ band) is promoted to the TOP of the priority order and can never be dropped for 
 thread deprioritised in its last days under one routine surfaces only after the next routine's
 slower cadence catches it - the Renaissance / Drew Robertson thread sat 5 business days that way.
 
-Review my SENT mail for threads that need MY follow-up. ALWAYS run as parallel subagents
-sharded by date range. Read-only analysis; create drafts only, never send. Apply the
-READY-TO-ARCHIVE label to threads concluded done (see that section).
+Review my inbox for items that need MY follow-up. ALWAYS run as parallel subagents
+sharded by date range.
   SHARD OWNERSHIP (BLOCKING - added 2026-08-17): when this run is sharded, a thread belongs to
   exactly the shard whose date window contains its NEWEST NON-DRAFT message. A long thread has
   messages in several windows, so several shards WILL see it - only one may act. If the newest
@@ -39,32 +29,37 @@ READY-TO-ARCHIVE label to threads concluded done (see that section).
   it. This is the only thing that actually prevents same-run duplicates: shards run concurrently and
   cannot see each other's drafts, so the draft-exists gate can never catch them, and the after-the-
   fact dedupe self-check can only REPORT a duplicate - there is no delete-draft tool, so a duplicate
-  that reaches the mailbox must be removed by hand.
-SHARD COMPLETENESS (critical): before reporting, run ONE global count for
-in:sent older_than:7d newer_than:30d (expect several hundred - page through them ALL; the total must
-come from paging to exhaustion, never from a result-count estimate). Verify the shards' combined
-processed-thread count reconciles with that total. If any shard errored, returned nothing, or is
-suspiciously thin, RE-RUN that shard - never report success with a missing or partial shard. Past
+  that reaches the mailbox must be removed by hand. Read-only analysis; create drafts only, never send. Apply the
+READY-TO-ARCHIVE label to threads concluded done (see that section) and run the NOISE
+SWEEP at the end.
+SHARD COMPLETENESS (critical): before reporting, run ONE global search (in:inbox
+newer_than:30d) and count threads, AND a second global count for in:sent newer_than:7d (page through all pages; the 7-30 day sent window belongs to the deep-sent-scan routine). Verify the shards' combined processed-thread counts
+reconcile with BOTH totals separately - inbox processed vs inbox total, sent processed vs sent
+total. If any shard errored, returned nothing, or is suspiciously
+thin, RE-RUN that shard - never report success with a missing or partial shard. Past
 runs silently dropped entire date ranges; this check is mandatory.
 
 ## SCOPE & PRE-FILTER
+- Reply scan: in:inbox newer_than:30d, minus automated senders (notifications@*, noreply@*,
+  reminder@superhuman.com, *@docusign.net, drive-shares-dm-noreply@google.com,
+  notifications@calendly.com, newsletters). The "commitments I made" scan (unsent docs /
+  unkept promises) uses the same 30d window.
 - READ STATE IS MEANINGLESS: Shimon archives what he has processed - a thread still in INBOX
   is unhandled regardless of read/unread. Never use is:unread or is:read as a signal.
 - SENT-ONLY / SELF-INITIATED scan (CLOSES A COVERAGE GAP - a thread I STARTED that has no
   reply yet lives in Sent, NOT Inbox, so the in:inbox reply-scan never sees it; e.g. the
   "Copperhelm + Security Hub Extended - next step" thread to Beville/Amazon was missed exactly
-  this way): ALSO scan in:sent older_than:7d newer_than:30d. For every sent thread where (a) my message is
+  this way): ALSO scan in:sent newer_than:7d. (The 7-30 day sent window is owned by the separate deep-sent-scan routine that runs Mon + Thu - do not scan it here; the two routines coordinate via shared drafts and the READY-TO-ARCHIVE label.) For every sent thread where (a) my message is
   the latest/only message with NO reply back, (b) no meeting is booked with that person, (c) no
   draft and no READY-TO-ARCHIVE tag already exist on it, and (d) the message EXPECTS a response
   - a next-step, a question, a scheduling ask, or outreach awaiting reply (NOT a pure FYI,
-  forward, closure, receipt, or internal @copperhelm.com note) - feed it into Gate 1b:
-  if 3+ BUSINESS DAYS silent, DRAFT a nudge (with the mandatory slot grid
-  if it is a scheduling thread). De-dupe by threadId across shards so each thread is
+  forward, closure, receipt, or internal @copperhelm.com note) - feed it into Gate 1b exactly
+  like an inbox thread: if 3+ BUSINESS DAYS silent, DRAFT a nudge (with the mandatory slot grid
+  if it is a scheduling thread). De-dupe by threadId against the inbox scan so each thread is
   handled once. Subject to all the same gates (PRE-DRAFT CALENDAR + RECENCY, teammate, never-flag).
-  PAGINATION IS MANDATORY - THIS IS THE #1 CAUSE OF MISSED FOLLOW-UPS: in:sent older_than:7d newer_than:30d
-  currently returns ~400 threads and the API pages at 50, so ONE call sees only the newest ~12% and
-  everything older is completely invisible. You MUST page through EVERY page (follow nextPageToken
-  until exhausted) OR shard the sent scan into date sub-windows exactly like the inbox scan. Note a
+  PAGINATION IS MANDATORY: the API pages at 50 and a single bulk campaign can fill a page on its
+  own, so even a 7-day sent window can span multiple pages. You MUST page through EVERY page
+  (follow nextPageToken until exhausted). Note a
   single bulk campaign can bury a week of real threads on its own (~30 Black Hat emails sent within
   two minutes did precisely that). RECONCILE: report the total sent-thread count AND the number
   actually evaluated; if they differ, fetch the missing pages before reporting. Real threads missed
@@ -118,10 +113,69 @@ Threads from tomie@merlin.vc (or any investor) with subject "Intro: Copperhelm <
 warm PROSPECT introductions, NOT investor relations. The introduced prospect MUST be triaged
 exactly like any sales thread: gate, 3-business-day nudges with the full slot grid, calendar
 checks by the prospect's name. Only the investor's OWN relationship threads are never-flag.
-The inbox-side reconciliation of these threads belongs to the daily routine; here they arrive
-through the sent scan like any other thread. PAST FAILURE: Imana Rucker / Foresight was wrongly
-drafted despite an existing booking - always verify a booking with a person-name calendar search
-before drafting, never assume.
+MANDATORY RECONCILIATION: run search in:inbox subject:"Intro: Copperhelm" newer_than:30d and
+account for EVERY hit in exactly one bucket: (a) drafted this run, (b) meeting booked
+(verified by person-name calendar search), (c) awaiting reply - too fresh (<3 business
+days), or (d) investor's own thread. An intro thread missing from all four buckets is a RUN
+FAILURE - go back and process it before reporting. PAST FAILURE: Imana Rucker / Foresight was
+once wrongly drafted despite an existing booking - always verify bucket (b) with a person-name
+calendar search, never assume.
+
+## POST-CALL RECONCILIATION (BLOCKING - closes a class of misses no email scan can catch)
+A call that produced NO email thread is invisible to both the inbox scan and the sent scan -
+there is nothing to scan. Real case (2026-08-06 audit): 12 calls in 10 days had zero follow-up,
+including McKesson (10 days), Keysight and BankUnited (9 days), Lemonade (8 days), and Estee
+Lauder (7 days, two calls the same day).
+EVERY RUN: search from:do-not-reply@gong.io subject:"Call recording and analysis is ready"
+newer_than:14d (page through all pages). For EACH call notification: read the counterparty name,
+company and call timestamp, resolve that person's email from the thread / prior mail / HubSpot,
+then verify a SENT message to them exists AFTER the call timestamp.
+- No sent message after the call AND 1+ business day elapsed -> follow-up is OWED. Open the Gong
+  notification and use its "Key points" and "Next steps" sections as the content, then DRAFT it
+  (subject to every pre-draft gate: threading, draft-exists, calendar, recency, recipient check).
+  A message sent BEFORE the call never counts - check the timestamp, not just the recipient.
+  SUBSTANTIVE ONLY (fixes the Marsh / Dan Bowden miss found 2026-08-08): logistics-only notes -
+  running late, Zoom links, same-day scheduling chatter - do NOT count as the follow-up even when
+  timestamped after the call; the verifying sent message must deliver the actual recap, promised
+  info, or next step.
+- The Copperhelm participant was a teammate, not Shimon -> surface under needs-human-review naming
+  that teammate; do not draft from Shimon's account.
+- Anonymized or broker-run sessions (Sagetap and similar, where the notification carries no
+  identifiable counterparty) -> list under needs-human-review; those get chased in the broker
+  platform, not by email.
+- VENDOR/BROKER OPS CALLS ARE IN SCOPE when SHIMON owes an email action from them (fixes the
+  Execweb/CyberRisk Aug 6 miss: Shimon owed the rejected-leads list and the contract-terms email):
+  classify [OPS] and draft the owed email - 'vendor' never exempts an action Shimon personally
+  committed to on the call.
+- SLACK-CHANNEL DEALS (real cases: Lemonade, GoPuff): when the call's next steps explicitly live in
+  Slack or another non-email channel, do NOT draft an email - list under needs-human-review as
+  'verify in Slack'.
+- CALENDAR-INVITE COMMITMENTS (fixes the Estee Lauder late-January and Elevate Textiles Oct-12
+  misses found 2026-08-08): when the agreed next step is that SHIMON SENDS A CALENDAR INVITE for a
+  specific future date, search Google Calendar for that event; if it does not exist, surface under
+  needs-human-review as 'create invite: <counterparty> <date>' EVERY run while the call is inside
+  the 14d window, and treat it as [ACTION]-class - a far-future date must never read as 'deferred,
+  nothing to do'.
+- BOOKED-MEETING SUPPRESSION (BLOCKING, added 2026-08-09 after the Mercury/Rich Phillips slip):
+  BEFORE drafting any post-call follow-up, search Google Calendar for a FUTURE meeting with that
+  counterparty. If one exists:
+  (a) the call's next steps include a concrete deliverable Shimon owes (scope doc, pricing, access,
+      intro) -> draft ONLY that delivery as a short pre-meeting note. NO scheduling ask, NO slot
+      grid, no "when works for you" - the meeting is already set.
+  (b) nothing is owed -> do NOT draft at all. The booked meeting IS the follow-up; list it under
+      "booked - no draft needed".
+  Real case: the Aug 3 Mercury call's own next steps were "Shimon will send a placeholder invite
+  for Monday at 10 AM" - he did, on Aug 3 - and the routine still drafted a follow-up on Aug 8
+  while that Aug 10 meeting sat on the calendar.
+- HONOR READY-TO-ARCHIVE ON THIS PATH TOO: if the thread you would anchor a post-call draft to is
+  tagged READY-TO-ARCHIVE, do NOT revive it (the Mercury draft landed on a tagged July thread whose
+  last message was a nudge with long-expired slots). Start a fresh thread, or skip.
+- Also sweep Granola meeting notes the same way - the Granola connector IS attached to this routine
+  (added 2026-08-08 after four Granola-only meetings - Insight Partners, SignalFire, Boston
+  Meridian, ICON - went invisible because the prompt referenced a connector the routine did not
+  have); meetings with no Gong recording (in-person, phone) are otherwise invisible too.
+RECONCILE and report: calls found, calls with a verified follow-up, calls drafted this run, calls
+surfaced for a teammate. A call in none of those buckets is a RUN FAILURE.
 
 ## GATE - flag only if ALL pass
 1. SELF-REPLY / CROSS-THREAD:
@@ -198,6 +252,7 @@ This covers:
   - Gone-dark threads: 7 unanswered nudges, or aging out of the 30d window with no reply
     (tag instead of hard-archiving).
   - Any evaluated thread with a closed loop and no pending next step for me.
+  - Everything caught by the NOISE SWEEP below.
 LABEL MECHANICS (do not skip): the label exists - id Label_5913419933435317385 (confirm via
 list_labels; create with create_label only if missing). Apply it to each qualifying thread
 with label_thread (which takes the label ID). VERIFY at the end: search_threads with query
@@ -207,6 +262,48 @@ count in the output; if 0, state that explicitly and explain why.
 Do NOT tag investor/internal threads with live discussion. Tagging is the routine's job; the
 actual archive stays a human action. List every tagged thread under "Ready to archive".
 
+## NOISE SWEEP (bulk-tag informational mail as READY-TO-ARCHIVE)
+After the main pass, run these inbox searches (in:inbox, within the 30d window) and
+tag EVERY matching thread - these are notifications I never need to act on in email:
+  - Calendar responses: subject starts "Accepted:", "Declined:", "Updated invitation:",
+    "Canceled event:", "New Time Proposed:" that were already resolved.
+  - from:notifications@calendly.com (booking notices - the event is on the calendar already).
+  - from:noreply@notifications.hubspot.com (deal assignments, form notifications). If one is
+    a NEW DEMO FORM lead, still tag the email but surface the lead under needs-human-review.
+  - from:reminder@superhuman.com (deprecated reminders).
+  - from:drive-shares-dm-noreply@google.com (the doc lives in Drive).
+  - from:invitations@linkedin.com and similar social notifications.
+  - Receipts / ride / service notifications (uber, zoom, openai and similar noreply
+    transactional senders).
+  - OOO auto-replies.
+  - Newsletters / marketing blasts (fourseasons, AWS community/partner mail, luma, event
+    promos, blackhat) and cold outbound TO me that I ignored.
+  - DocuSign notices whose subject/body says the envelope was COMPLETED (everyone signed) or
+    VOIDED - these exact states only.
+NEVER noise-tag:
+  - Billing/payment FAILURE notices (card declined, payment failed, account at risk) - these are
+    real [OPS] items; surface under needs-human-review instead of tagging (real case 2026-08-08:
+    Microsoft 'Your credit card was declined' invoice notice sat noise-classed).
+  - DocuSign envelopes awaiting MY signature: any "Complete with Docusign: ..." / "sent you
+    a document to review and sign" notice with NO LATER completed/voided notice for the SAME
+    envelope. When in doubt about an envelope's state, do not tag it.
+  - Fresh meeting invitations ("Invitation:") I have not accepted/declined yet.
+  - PERSONAL mail: messages from personal contacts (family, friends, my wife
+    reutdavid2@gmail.com, personal gmail/free-mail addresses I correspond with that are not
+    vendors or newsletters). The noise sweep only touches automated/bulk senders - if a
+    human personally wrote the email and it is not a sales cadence, leave it alone.
+  - Anything containing an unanswered question addressed to me.
+Report the noise-tag count separately from the main-pass tags.
+
+## INVITES AND PERSONAL FYI (output-only - never draft, never auto-accept)
+- UNANSWERED MEETING INVITATIONS: inbound meeting invites (subject 'Invitation:' or carrying an
+  .ics) where Shimon is still needsAction on the calendar and the meeting is under 5 days away ->
+  surface under needs-human-review with the meeting date (real cases 2026-08-08: TPG ICP review
+  for Aug 10 still unaccepted; TLB Q4 catch-up invite with no calendar event at all). NEVER
+  accept or decline on Shimon's behalf.
+- PERSONAL DEADLINES: personal mail is never drafted, tagged, or archived by the routine, but a
+  personal message carrying an explicit deadline gets a one-line FYI in the output (real case:
+  afterschool registration closing Aug 12).
 
 ## BUCKETS (rank in this order; within a bucket rank by urgency x age)
 - [ACTION] - I owe a deliverable, not a reply: sign a doc, send an NDA, grant access, make
@@ -438,7 +535,7 @@ Otherwise list gone-dark threads (I sent last, no reply) without drafting.
    signature-only shells). First-touch/intro drafts include the COPPERHELM BLURB verbatim;
    warm-prospect drafts were built from the FULL TRANSCRIPT (Granola) or, if none existed, the Gong notification's full key points - never from ask_account/ask_deal/generate_brief.
 3. READY-TO-ARCHIVE: verify with search_threads query label:READY-TO-ARCHIVE (the NAME -
-   searching by label id silently returns empty) and report the tagged count.
+   searching by label id silently returns empty) and report main-pass + noise-sweep counts.
 4. Scan the tagged list one final time: no pending-signature DocuSign, no personal mail, no
    thread with an owed deliverable. Untag (unlabel_thread) anything that slipped through.
 5. Every [ACTION] flag has a corresponding draft (an owed deliverable without a draft is a
@@ -455,10 +552,10 @@ Otherwise list gone-dark threads (I sent last, no reply) without drafting.
      there must be NO new draft; it belongs under "Already contacted recently (skipped)" -
      except [ACTION] deliverable drafts, which are exempt from this gate.
    - No empty/body-less draft exists.
-7. SHARD RECONCILIATION: confirm the shard completeness check passed - the global
-   in:sent older_than:7d newer_than:30d total, counted by paging to exhaustion, reconciles with the
-   shards' combined processed count. Report the reconciliation explicitly in the output. If it
-   fails, re-process the gap before reporting.
+7. SHARD + INTRO RECONCILIATION: confirm the shard completeness check passed (global 30d
+   thread count vs shards processed) AND the "Intro: Copperhelm" reconciliation accounted
+   for every intro thread in one of its four buckets. Report both reconciliations explicitly
+   in the output. If either fails, re-process the gap before reporting.
 8. SAME-RUN DEDUPE (one single-shard pass AFTER all shards finish): collect every (threadId,
    recipient) drafted this run and confirm each appears EXACTLY once. Parallel shards cannot see
    each other's drafts - a draft is not in:sent and sits on the same thread - so this final pass is
@@ -470,16 +567,16 @@ Fix any failure before producing the output.
 ## OUTPUT
 1. Executive summary (top items).
 2. Flagged, grouped [ACTION] -> [REPLY] -> [OPS], each with gate evidence, urgency, transcript source used (Granola transcript / Gong notification fallback), and the draft.
-3. [READY-TO-ARCHIVE] - threads tagged this run, with one-line reasons
-   (meeting done / booked / nudge cap / closed loop).
+3. [READY-TO-ARCHIVE] - threads tagged this run: main-pass list with one-line reasons
+   (meeting done / booked / nudge cap / closed loop) + noise-sweep count by category.
 4. "Discard stale auto-drafts" list.
 5. "Checked but NOT flagged" (teammate-driven / booked / investor / etc) + "Awaiting reply
    (too fresh to nudge)" list + "Already contacted recently (skipped - emailed within 7d)"
    list.
 6. "Gone dark" (7 unanswered nudges or aged out of window -> tagged READY-TO-ARCHIVE).
 7. CRM / needs-human-review (incl. any drafts skipped for empty body).
-8. RECONCILIATIONS: shard completeness (sent threads counted vs processed) +
-   pre-draft-calendar-gate result.
+8. RECONCILIATIONS: shard completeness (threads counted vs processed) + intro-thread
+   accounting (every "Intro: Copperhelm" hit and its bucket) + POST-CALL reconciliation (calls found / followed up / drafted / teammate) + pre-draft-calendar-gate result.
 9. Push notification only if >=1 flag.
 
 if a draft already exists dont create another one
@@ -523,7 +620,7 @@ Black Hat premises on 2026-08-08).
 
 WORKLOAD SPLIT + PRIORITY BATCH (2026-08-03) - added after the first full-pagination runs proved the complete 30-day sent scan does not fit in one session (the manual run produced 2 drafts then stalled; the scheduled run produced 6 drafts and silently dropped 7 known candidates: Mercury, Global Credit Union, Light & Wonder, Auctane, Amy Chaney, Golan, New Era). BLOCKING rules:
 
-1. WORKLOAD SPLIT: this deep-scan routine owns in:sent older_than:7d newer_than:30d ONLY. The daily "email" routine owns in:inbox 30d + in:sent 7d. Never scan the other routine's window. Coordination is via shared Gmail state: the DRAFT-EXISTS gate and the READY-TO-ARCHIVE label prevent double-handling.
+1. WORKLOAD SPLIT: this daily routine owns in:inbox newer_than:30d AND in:sent newer_than:7d ONLY. The separate "deep sent scan" routine (runs Mon + Thu) owns in:sent older_than:7d newer_than:30d. Never scan the other routine's window. Coordination is via shared Gmail state: the DRAFT-EXISTS gate and the READY-TO-ARCHIVE label prevent double-handling.
 
 2. PRIORITY ORDER + REMAINDER REPORTING: before drafting, rank ALL draft candidates - strongest pending next step first (owed deliverable > direct unanswered question > expired-slots rescheduling > plain nudge), oldest first within a rank - and work down the list in that order. If the session runs low on budget, the FINAL section of the output MUST list every candidate NOT processed, titled "NOT PROCESSED (ran out of budget)" with thread subjects and counterparties. A run that drops candidates silently is a FAILURE; a run that reports its remainder is fine.
 

@@ -1,0 +1,21 @@
+
+## READY-TO-ARCHIVE TAGGING
+Apply the Gmail label READY-TO-ARCHIVE to any thread the routine evaluates and concludes is
+DONE - no action item on my side, nothing I need to reply to or drive, and safe to archive.
+This covers:
+  - Self-sent-last threads where the meeting already happened (Gate 1b) AND no deliverable
+    is still owed.
+  - Booked-meeting threads caught by the PRE-DRAFT CALENDAR GATE (prospect already has a
+    future meeting) - tag instead of drafting.
+  - Gone-dark threads: 7 unanswered nudges, or aging out of the 30d window with no reply
+    (tag instead of hard-archiving).
+  - Any evaluated thread with a closed loop and no pending next step for me.
+  - Everything caught by the NOISE SWEEP below.
+LABEL MECHANICS (do not skip): the label exists - id Label_5913419933435317385 (confirm via
+list_labels; create with create_label only if missing). Apply it to each qualifying thread
+with label_thread (which takes the label ID). VERIFY at the end: search_threads with query
+label:READY-TO-ARCHIVE - the label NAME, not the id. KNOWN BUG: searching label:<labelId>
+returns empty even when threads are tagged; only the name form works. Report the tagged
+count in the output; if 0, state that explicitly and explain why.
+Do NOT tag investor/internal threads with live discussion. Tagging is the routine's job; the
+actual archive stays a human action. List every tagged thread under "Ready to archive".

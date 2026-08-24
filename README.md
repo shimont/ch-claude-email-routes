@@ -4,18 +4,27 @@ Backup and analysis of the Claude Routines that manage `shimon@copperhelm.com`.
 
 ## Contents
 
-- [`routines/`](routines/) — verbatim backup of the three Routine prompts, with their schedules and
-  trigger IDs. Snapshot taken 2026-08-17.
-  - [`01-daily-email.md`](routines/01-daily-email.md) — daily follow-up scan, `0 5 * * *`
-  - [`02-4h-triage.md`](routines/02-4h-triage.md) — fresh inbound triage, `0 7,11,14,17 * * *`
-  - [`03-deep-sent-scan.md`](routines/03-deep-sent-scan.md) — 7–30 day sent scan, `0 9 * * 1,4`
-  - [`manifest.json`](routines/manifest.json) — trigger IDs, crons, environment and model config
-- [`ANALYSIS.md`](ANALYSIS.md) — gaps, overlaps and suggested improvements across the three.
-- [`proposed/`](proposed/) — ready-to-apply changes.
-  - [`CHANGES-2026-08-17.md`](proposed/CHANGES-2026-08-17.md) — cron/model settings plus the
-    deep-sent-scan prompt rewrite, with the reasoning for each
-  - [`03-deep-sent-scan.prompt.txt`](proposed/03-deep-sent-scan.prompt.txt) — paste-ready prompt
-  - [`03-deep-sent-scan.diff`](proposed/03-deep-sent-scan.diff) — what changed vs the backup
+- [`policy/`](policy/) — **the source of truth.** Each routine is an ordered list of fragments;
+  `fragments/shared/` holds the 13 blocks daily and deep have in common, so they exist once.
+- [`tools/render.py`](tools/render.py) — assembles a routine's prompt. `--verify` proves every
+  routine still reproduces its baseline byte-for-byte.
+- [`routines/`](routines/) — byte-exact baseline of what is live, plus `manifest.json`
+  (trigger IDs, crons, models). `.prompt.txt` is exact; `.md` is the readable view.
+- [`ANALYSIS.md`](ANALYSIS.md) — gaps, overlaps and improvements across the three routines.
+- [`MIGRATION.md`](MIGRATION.md) — deviation check, cutover plan, and the bootstrap prompt.
+- [`proposed/`](proposed/) — the first fix batch, staged for manual application.
+
+```
+$ python3 tools/render.py --verify
+  daily    55324 ch  OK  matches routines/01-daily-email.prompt.txt
+  deep     50340 ch  OK  matches routines/03-deep-sent-scan.prompt.txt
+  triage   27851 ch  OK  matches routines/02-4h-triage.prompt.txt
+
+all routines reproduce their baseline byte-for-byte
+```
+
+Run that before opening any PR. The fragment split is a relocation of text, never an edit — a real
+change must show up as both a fragment diff and a baseline diff.
 
 ## Editing a routine
 

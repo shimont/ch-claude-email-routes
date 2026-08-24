@@ -1,0 +1,19 @@
+
+## OUTPUT
+1. Executive summary (top items).
+2. Flagged, grouped [ACTION] -> [REPLY] -> [OPS], each with gate evidence, urgency, transcript source used (Granola transcript / Gong notification fallback), and the draft.
+3. [READY-TO-ARCHIVE] - threads tagged this run: main-pass list with one-line reasons
+   (meeting done / booked / nudge cap / closed loop) + noise-sweep count by category.
+4. "Discard stale auto-drafts" list.
+5. "Checked but NOT flagged" (teammate-driven / booked / investor / etc) + "Awaiting reply
+   (too fresh to nudge)" list + "Already contacted recently (skipped - emailed within 7d)"
+   list.
+6. "Gone dark" (7 unanswered nudges or aged out of window -> tagged READY-TO-ARCHIVE).
+7. CRM / needs-human-review (incl. any drafts skipped for empty body).
+8. RECONCILIATIONS: shard completeness (threads counted vs processed) + intro-thread
+   accounting (every "Intro: Copperhelm" hit and its bucket) + pre-draft-calendar-gate result.
+9. Push notification only if >=1 flag.
+
+if a draft already exists dont create another one
+
+When in doubt, don't flag.

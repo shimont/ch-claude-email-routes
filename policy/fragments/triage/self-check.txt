@@ -1,0 +1,31 @@
+
+## SELF-CHECK (mandatory, before finishing)
+1. IDEMPOTENCY honored: no draft was created on any thread that already had a draft, was already
+   tagged READY-TO-ARCHIVE, or where I had already replied. Re-verify a sample.
+2. Every scheduling draft carries the 3-day x 3-slot grid in htmlBody with every time a hyperlink
+   built from scratch (clean calendly.com URL, no google.com/url), the 3 days the SOONEST available
+   AT OR AFTER the +3-business-day floor (never sooner), earliest-time-first. A link-only draft, a
+   date sooner than the 3-business-day floor, or a far-out-date scheduling draft is a FAILURE. Verify at
+   construction time (drafts API does not return reply-draft bodies and rewraps links on read-back). Also confirm every scheduling draft VISIBLY labels the timezone (US Eastern / ET) next to the slots in BOTH body and htmlBody; unlabeled times are a FAILURE.
+3. Every draft's replyToMessageId is the thread's newest non-draft message - NOT the threadId/first
+   message. Verify at CONSTRUCTION time, before create_draft: re-fetch the thread (never the truncated
+   minimal view) and confirm the id about to be passed equals the max-date non-draft message - the
+   API cannot reveal a draft's anchor after creation. A mis-anchored draft renders disconnected and
+   is a FAILURE, especially on threads over 5 messages. Every draft carries the HubSpot BCC AND a non-empty body. First-touch/intro drafts
+   include the COPPERHELM BLURB; warm-prospect drafts were built from the FULL TRANSCRIPT (Granola) or, if none existed, the Gong notification's full key points - never from ask_account/ask_deal/generate_brief.
+4. PRE-DRAFT GATES honored for EVERY draft: CALENDAR (email + full-NAME search returned no future
+   Calendly/accepted event before any scheduling ask) and RECENCY (cross-thread hits block only NEW
+   OUTREACH - never a reply to an inbound-latest thread, never an [ACTION] deliverable). No
+   empty/body-less draft exists.
+5. OWNERSHIP honored: every drafted thread's newest non-draft message was INBOUND and under 2 days
+   old. Anything else belonged to the daily email or deep sent scan routine and must appear under
+   "Owned by <routine> (skipped)", not as a draft.
+6. SAME-RUN DEDUPE (one pass AFTER all work finishes): collect every (threadId, recipient) drafted
+   this run and confirm each appears EXACTLY once. Report any duplicate under needs-human-review
+   with both draft ids so the extra can be deleted by hand.
+7. READY-TO-ARCHIVE verified with search_threads query label:READY-TO-ARCHIVE (the NAME). Scan the
+   tagged list: no pending-signature DocuSign, no personal mail, no billing-failure notice, no thread
+   with an unanswered question to me, no fresh unaccepted invitation. Untag (unlabel_thread) anything that slipped through.
+8. Every in-scope thread is accounted for in exactly one bucket (flagged / skipped-with-reason /
+   noise-tagged / owned-by-another-routine). No thread silently dropped.
+Fix any failure before producing the output.

@@ -1,0 +1,13 @@
+
+## INVESTOR INTRO THREADS ARE PROSPECTS (repeatedly missed - read carefully)
+Threads from tomie@merlin.vc (or any investor) with subject "Intro: Copperhelm <> ..." are
+warm PROSPECT introductions, NOT investor relations. The introduced prospect MUST be triaged
+exactly like any sales thread: gate, 3-business-day nudges with the full slot grid, calendar
+checks by the prospect's name. Only the investor's OWN relationship threads are never-flag.
+MANDATORY RECONCILIATION: run search in:inbox subject:"Intro: Copperhelm" newer_than:30d and
+account for EVERY hit in exactly one bucket: (a) drafted this run, (b) meeting booked
+(verified by person-name calendar search), (c) awaiting reply - too fresh (<3 business
+days), or (d) investor's own thread. An intro thread missing from all four buckets is a RUN
+FAILURE - go back and process it before reporting. PAST FAILURE: Imana Rucker / Foresight was
+once wrongly drafted despite an existing booking - always verify bucket (b) with a person-name
+calendar search, never assume.

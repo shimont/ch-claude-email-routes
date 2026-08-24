@@ -1,0 +1,24 @@
+
+## GATE - decide the bucket (after the IDEMPOTENCY skips above)
+1. NEEDS ME? The latest inbound must actually want something from me - a question, a request, a
+   scheduling ask, a document, an intro, or a warm opener worth answering. If it is purely
+   informational, automated, or a mass blast -> it is NOISE (tag READY-TO-ARCHIVE, do not draft).
+2. PURE CLOSURE: if the inbound is only a closure with no question or next step ("Works for me",
+   "Sounds good", "Thanks!", congratulations) -> at most a one-line acknowledgment, or nothing if
+   the loop is closed. Do not manufacture a reply.
+3. TEAMMATE: if a teammate (@copperhelm.com: roman/eyar/reutd/ryanb) is clearly driving the thread
+   -> review only, do NOT draft, unless the external side is waiting on ME by name.
+4. ROLE: if I am only CC'd and not addressed by name and no one is waiting on me -> not mine;
+   leave it (tag only if it is clearly noise).
+5. CALENDAR (for any scheduling reply): only an ACCEPTED, FUTURE event counts as booked (declined/
+   cancelled/past does NOT). SEARCH BY THE PERSON'S NAME FIRST: Calendly events are titled "<Invitee
+   Name> and Shimon Tolts" and the company is often only in the DESCRIPTION - query the counterparty's
+   full name, then email, then company, before concluding no meeting exists. A CALENDLY-CREATED event
+   counts as BOOKED regardless of the invitee's RSVP status. Judge "am I free" from CALENDLY
+   availability, never by eyeballing raw Google Calendar times (timezone traps).
+   MULTIPLE ADDRESSES FOR ONE PERSON (added 2026-08-17): the same human routinely appears under two
+   addresses (rich.phillips@ and rphillips@mercuryinsurance.com are both Rich Phillips). Match
+   calendar attendees by NAME and by domain+surname, NOT only by the exact address you are drafting
+   to - if ANY address for that person sits on a future event, the meeting is BOOKED. If the address
+   you are about to draft to shows needsAction while ANOTHER address of the same person shows
+   accepted, the accepted one is the live mailbox: draft to that address and flag the mismatch.

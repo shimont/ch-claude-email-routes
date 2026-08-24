@@ -1,0 +1,25 @@
+
+## IDEMPOTENCY (SKIP) RULES - check FIRST, before any analysis, and SKIP the thread if any hit:
+1. A DRAFT already exists on the thread (created by me or by the "email" follow-up routine) AND no
+   message arrived after that draft -> SKIP; never create a second draft on a thread that already
+   has one. List it under "Already has a draft (skipped)".
+   STALE-DRAFT EXCEPTION: if the draft is OLDER than the newest message on the thread, the
+   conversation moved on and that draft is obsolete. Do NOT silently skip and do NOT add a second
+   draft - list it under needs-human-review as "Stale draft - thread moved on, delete and
+   re-draft". Otherwise a dead draft hides live inbound forever (the Aphinia / Black Hat CISO
+   dinner thread kept two obsolete drafts while a request for a signed agreement went unseen).
+2. The thread is already tagged READY-TO-ARCHIVE -> SKIP (a prior run or the follow-up routine
+   already concluded it is done).
+3. I have already REPLIED to the latest inbound message (my message is newer than theirs) -> SKIP;
+   that thread belongs to the follow-up routine, not this one.
+4. PRE-DRAFT RECENCY GATE (person-level, CROSS-THREAD, NEW-OUTREACH only): if to:<recipient>
+   in:sent newer_than:7d returns a hit on a DIFFERENT thread AND the draft would be NEW OUTREACH
+   (the current thread's latest message is mine, or a brand-new thread) -> do NOT draft; list
+   under "Already contacted recently (skipped)". NEVER apply this skip when the thread's latest
+   message is INBOUND - the person wrote to ME, and answering is not duplicate outreach no matter
+   how recently I emailed them elsewhere. A recent send on THIS SAME thread never blocks. CAMPAIGN /
+   FYI SENDS DO NOT COUNT as recent contact (a bulk blast must never mask a real thread), and when
+   one person has several live threads, rank by strength of pending next step and keep the strongest
+   one eligible. (This gate exists solely to prevent duplicate cross-thread outreach.)
+These skips are what make a frequent routine safe: a thread handled in one run gets a draft or a
+tag, so the next run skips it automatically.

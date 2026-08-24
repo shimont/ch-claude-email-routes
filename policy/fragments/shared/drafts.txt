@@ -1,0 +1,160 @@
+
+## DRAFTS (create only - never send)
+- THREADING (BLOCKING - fixes drafts that render "disconnected from the main thread", e.g. the
+  Conga and PepsiCo nudges that got anchored to an old message): before EVERY create_draft, ALWAYS
+  re-fetch the thread in METADATA_ONLY or FULL_CONTENT - NEVER anchor from the minimal/truncated
+  view, which caps at the OLDEST ~5 messages and hides the latest on long threads. List ALL
+  messages, drop reminder@superhuman.com and trashed messages, sort by date, and set
+  replyToMessageId to the id of the message with the MAXIMUM date. Confirm that id is NOT the
+  threadId (in Gmail threadId == the FIRST/oldest message's id; anchoring there renders the draft
+  mid-thread, out of order). For any thread with MORE than 5 messages this re-fetch is mandatory -
+  do not trust an earlier minimal-view read. A draft whose replyToMessageId is not the true newest
+  non-draft message is a FAILURE.
+- DRAFT-EXISTS + STALENESS GATE (BLOCKING, check this FIRST on every thread): check whether a draft
+  already exists on the thread. If one exists and NO message has arrived since it was created, SKIP
+  the thread and list it under "Already has a draft (skipped)" - never create a second draft
+  (duplicate drafts on the Madhav Gopal and Raphael Caillet threads came from skipping this check).
+  STALE DRAFT: if a draft exists but the thread has NEWER messages dated AFTER that draft, the draft
+  is OBSOLETE - the conversation moved on. Do NOT silently skip it and do NOT add a second draft;
+  list it under needs-human-review as "Stale draft - thread moved on, delete and re-draft". Real
+  case: the Aphinia / Black Hat CISO dinner thread held two obsolete drafts while a new request for
+  a signed agreement arrived, and a plain draft-exists skip would have hidden that [ACTION] forever.
+- PRE-DRAFT RECENCY GATE (BLOCKING - fixes the repeated "drafted someone I already emailed"
+  miss, e.g. Brad Doctor / First Advantage, who got a 3rd near-identical intro after I had
+  already emailed him the day before on other threads): IMMEDIATELY before calling
+  create_draft on ANY thread, resolve each primary recipient's real email and search
+  to:<recipient> in:sent newer_than:7d for EACH of them. If I have sent that person ANYTHING
+  in the last 7 days ON A DIFFERENT THREAD than the one I am drafting on, do NOT create the
+  draft (duplicate cross-thread outreach). SAME-THREAD EXCEPTION: if the only recent send is my
+  OWN last message IN THIS SAME thread - the very message I am now following up on - that is NOT
+  a duplicate; it is exactly the self-sent-last nudge Gate 1b intends, so PROCEED per Gate 1b s
+  3-business-day timer. Do NOT let the 7-day recency window override the 3-business-day nudge. To
+  apply: when the to:<recipient> in:sent newer_than:7d search returns hits, check each hit s
+  threadId - if EVERY hit is on THIS thread, proceed; if ANY hit is on a different thread, skip and list
+  the thread under "Already contacted recently (skipped)". [ACTION] EXCEPTION: an owed
+  deliverable (NDA, doc, access, intro) is NEVER blocked by recency - deliver it regardless.
+  THREAD-RANKING EXCEPTION (fixes real misses - Temi/Microsoft Xbox and Josh/lululemon): when the
+  same person has MULTIPLE live threads, do NOT let the most recent send automatically suppress the
+  others. RANK the threads by strength of pending next step - a named intro, an owed deliverable, an
+  explicit commitment, or a direct unanswered question OUTRANKS a bulk/event/FYI blast - then nudge
+  the STRONGEST thread and suppress the weaker one instead. A low-value blast must NEVER mask a
+  high-value thread (a Black Hat invite silently parked a 13-day-old "connect me with Megan O'Neil"
+  ask).
+  CAMPAIGN / FYI SENDS DO NOT COUNT AS RECENT CONTACT: if the only recent send is part of a bulk
+  campaign or a pure announcement (e.g. ~30 near-identical Black Hat emails sent within minutes), it
+  does NOT trigger this gate at all.
+  PERSONALIZED BATCH IS NOT A MARKETING BLAST (BLOCKING, added 2026-08-10 after the Denver
+  roundtable batch was skipped): the campaign/blast exemptions exist ONLY to stop a blast from
+  (i) masking a higher-value thread and (ii) inflating the nudge cap. They must NEVER be read as
+  "this thread is a campaign, skip the nudge". A run of near-identical sends is a MARKETING BLAST
+  only if the bodies are genuinely interchangeable AND the recipients are a bulk/purchased list.
+  Individually addressed notes to real people Shimon met in person - even 14 of them sent in one
+  sitting off a shared template, even HubSpot-tracked - are ORDINARY WARM THREADS and get the
+  normal 3-business-day cadence, each on its own thread.
+  TELL THEM APART by per-person detail: "thank you for the personal feedback!!!", "not Cisco :)))",
+  "talk about bikes", "you had some very interesting questions" - that is a personalized batch.
+  REAL COST: 14 Denver / Merlin-roundtable leads were first-touched Tue Jul 21 (nudge-eligible Fri
+  Jul 24) and got nothing until Fri Jul 31 - 5 business days late - then the second round repeated
+  it. They only surfaced once they aged past 7 days into the deep-sent-scan window.
+  This is a PERSON-level check, deliberately BROADER
+  than the self-reply gate (Gate 1), which only looks inside a single thread and therefore
+  misses a lead I contacted on a separate thread or via a self-note. It matters most for
+  SELF-ADDRESSED met-lead notes and first-touch / new-thread outreach, where cross-thread
+  duplicates happen. Run this per-draft at draft time, for every draft, not just scheduling.
+- PRE-DRAFT CALENDAR GATE (BLOCKING - fixes the repeated "drafted someone who already
+  booked" miss, e.g. Imana Rucker/Foresight): IMMEDIATELY before calling create_draft on any
+  SCHEDULING thread, search the calendar by the recipient's EMAIL and by their full NAME
+  (Calendly events are titled "<Name> and Shimon Tolts"; the company may be only in the
+  description). If ANY future Calendly-created or accepted event with that person exists, DO
+  NOT create a scheduling draft - the meeting is already booked; tag the thread
+  READY-TO-ARCHIVE and list it under booked. [ACTION] EXCEPTION: an owed deliverable is still
+  drafted regardless (without a scheduling ask) - a booked meeting never suppresses [ACTION]. Run this per-draft at draft time; never rely on
+  an earlier shard's calendar pass.
+- LAST-SECOND CLAIM RE-CHECK (BLOCKING - added 2026-08-17): immediately before EVERY create_draft,
+  re-run list_drafts for to:<primary recipient> one final time. If a draft now exists on this thread
+  that was not there when you ran the draft-exists gate, ABORT this draft and report the thread
+  under needs-human-review as "concurrent draft detected - verify before sending". This narrows the
+  race window from minutes to seconds; prevention is the only cure, because duplicates cannot be
+  deleted by any tool available to this routine.
+- NO EMPTY DRAFTS (BLOCKING): never create a draft with an empty or signature-only body. If
+  you cannot generate real body content (Calendly/Gong failed, or nothing substantive to
+  say), SKIP the draft and list the thread under needs-human-review. Every created draft MUST
+  have a non-empty body AND the HubSpot BCC 49089586@bcc.hubspot.com.
+- Keep recipients/cc; BCC 49089586@bcc.hubspot.com on EVERY draft, no exceptions (including
+  operational/vendor/OPS drafts); one draft per thread. Match the thread's language
+  (Hebrew -> Hebrew).
+- CONTEXT: for a warm/known prospect (prior call, deal, POV/pilot, references a past convo),
+  read the FULL TRANSCRIPT first (see CALL CONTEXT) and make the draft reference the real topic and
+  agreed next step. For first-touch/intro threads, include the COPPERHELM BLURB instead.
+- VOICE (this is how I actually write - not all-lowercase):
+  - Greeting: "Hi <First>," ("Hey <First>," for peers/teammates). A lone "Name?" for a nudge.
+  - Normal capitalization. My real quirk is dropped apostrophes on capitalized words (Im,
+    Ill, thats) mixed in lightly - do not fabricate typos, and use correct apostrophes for
+    enterprise/serious mail.
+  - ":)" for warmth where it fits. One thought per line, blank line between.
+  - Plain ASCII only (hyphen -, never en/em dash). Never state the meeting duration/length.
+  - Close: "Looking forward to it" then a bare "Thanks" / "Thanks!" - NO typed name
+    (signature auto-appends).
+  - Casual/short for peers; measured and firm for enterprise; casual Hebrew for Hebrew threads.
+- WHAT COUNTS AS A SCHEDULING DRAFT (BLOCKING - broadened 2026-08-08 after post-call recap
+  drafts to Chemours and Fiserv shipped with a bare Calendly link / a single time and NO grid.
+  The old wording said "whose purpose is to get a meeting scheduled", and a recap email whose
+  next step merely happens to be a meeting did not read as one): a draft is a SCHEDULING draft,
+  and therefore REQUIRES the full 3-day x 3-slot grid, whenever ANY of these is true - regardless
+  of whether scheduling is the email's headline purpose:
+  (a) it contains a Calendly link of ANY kind;
+  (b) it asks the counterparty for times, availability, or "let me know what works";
+  (c) the agreed next step is a meeting that is NOT yet on the calendar;
+  (d) it is a post-call recap or follow-up whose next step is another session.
+  A bare "see all times" link is NOT a substitute for the grid, and neither is asking them to
+  send times - offer the grid AND the link, every time.
+  THE COUNTERPARTY OWING US TIMES DOES NOT EXEMPT THE GRID (real case: Alex/Chemours said he
+  would send times for the deep dive, so the draft only asked and linked - propose the grid
+  anyway; it removes a round trip and they can still override it).
+  EXACTLY TWO EXEMPTIONS: (1) they already named a specific time -> just confirm it, no grid;
+  (2) the meeting DATE is already agreed and the email only promises the invite (e.g. AUNDE
+  Oct 5, Fiserv Mon Aug 17 hold) -> no grid, but that invite must be tracked per
+  CALENDAR-INVITE COMMITMENTS.
+- SCHEDULING (applies to EVERY scheduling draft as defined directly above - first outreach,
+  follow-up nudges, met-lead notes, post-call recaps, all of them): pull live Calendly availability
+  (EST event) and ALWAYS offer 3 slots on EACH of 3 days (9 total), grouped by day. A
+  scheduling draft with only the bare Calendly link and no slot grid is a FAILURE - the
+  "see all times" link is an addition at the end, never a replacement for the grid.
+  SOONEST-DATE PRIORITY (most important - this is the #1 scheduling rule): enforce a MINIMUM
+  LEAD TIME - NEVER propose a slot sooner than 3 FULL BUSINESS DAYS from today (business days =
+  Mon-Fri, per the BUSINESS DAYS definition above; e.g. a run on Monday proposes Thursday at the
+  earliest, a run on Thursday proposes the following Tuesday at the earliest - the weekend does
+  not count). Compute that floor date FIRST, then query Calendly starting from the floor date and
+  walk FORWARD in time; use the 3 SOONEST calendar days AT OR AFTER the floor that have ANY open
+  slots (the nearest eligible dates - typically within the following 1-2 weeks). Do NOT jump to
+  dates weeks out: if the first eligible availability is the week after the floor, use THAT week -
+  only propose later dates when there is genuinely nothing sooner. NEVER propose anything earlier
+  than the 3-business-day floor UNLESS the counterparty explicitly asked for a sooner or
+  specific day/time - their explicit request ALWAYS wins over the floor (the floor governs
+  only unprompted proposals). NEVER reuse a hardcoded or example date; compute the real
+  eligible dates from live availability on every run.
+  EARLIEST-TIME PRIORITY (within each of those 3 chosen days): pick the 3 EARLIEST open slots
+  of that day (early US morning = my afternoon in Israel); do not lead with afternoon times.
+  Only deviate on time-of-day if the counterparty explicitly asked for a specific time.
+  FORMATTING (mandatory): pass BOTH body (plaintext fallback) AND htmlBody to create_draft.
+  In htmlBody every time must be a hyperlink whose visible text is ONLY the time, grouped
+  under a bold day line, soonest-day-first and earliest-time-first. Structure (the specific
+  date/times below are ILLUSTRATIVE ONLY - always substitute the real soonest-available
+  dates/times from live Calendly):
+  <strong>Mon Jul 27</strong> <a href="https://calendly.com/shimon-copperhelm/30min/20260727T1200Z?source=email&timezone=America%2FNew_York">8:00am</a> - <a href="...">9:00am</a> - <a href="...">9:30am</a>
+  NEVER show a raw URL in the visible text of the email. Label every time in ET / US Eastern - never city names, and never "EST" (in summer it is
+  EDT; "ET" is always safe). MANDATORY TIMEZONE LABEL: every scheduling draft
+  MUST visibly state the timezone right next to the slots - open the grid with a line like "A
+  few times that work on my end (US Eastern):" AND end it with an "All times ET" line - in
+  BOTH the plaintext body AND the htmlBody. A draft that lists any time without a visible ET /
+  US-Eastern label is a FAILURE. End with a "see all times" hyperlink to
+  https://calendly.com/shimon-copperhelm/30min?source=email&timezone=America%2FNew_York
+  URL RULES: construct every deep link FROM SCRATCH from the Calendly slot's UTC start time
+  (compact YYYYMMDDTHHMMZ). NEVER copy links out of email bodies read back through the API -
+  Gmail serves them rewrapped as https://www.google.com/url?q=... redirectors. KNOWN QUIRK:
+  reading a DRAFT back through the API also shows google.com/url wrappers even when the
+  stored link is clean - this is a display artifact, so judge link cleanliness ONLY at
+  construction time, never by re-reading drafts.
+  Exceptions: if they named a specific day, give 3 slots that day (still earliest-time-first);
+  if they proposed a specific time, just confirm it (no grid).
+- [ACTION] items: acknowledge the specific deliverable; bracket attachments [ATTACH: ...].

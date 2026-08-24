@@ -1,0 +1,27 @@
+{
+  "routine": "deep",
+  "display_name": "Shimon@copperhelm.com deep sent scan",
+  "cron_utc": "0 9 * * 1,4",
+  "source_of_truth": "routines/03-deep-sent-scan.prompt.txt",
+  "fragments": [
+    "deep/preamble",
+    "deep/single-writer-thread-ownership",
+    "deep/scope-pre-filter",
+    "shared/copperhelm-blurb",
+    "shared/call-context-always-read-the-full-transcript-nev",
+    "shared/investor-intro-threads-are-prospects",
+    "shared/gate-flag-only-if-all-pass",
+    "shared/ready-to-archive-tagging",
+    "deep/noise-sweep",
+    "shared/buckets",
+    "shared/self-addressed-notes-leads-i-met",
+    "shared/never-flag",
+    "shared/urgency",
+    "shared/gone-dark",
+    "shared/drafts",
+    "shared/self-check",
+    "deep/output",
+    "shared/month-audit-fix-batch",
+    "deep/workload-split-priority-batch"
+  ]
+}

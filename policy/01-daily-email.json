@@ -1,0 +1,29 @@
+{
+  "routine": "daily",
+  "display_name": "Shimon@copperhelm.com daily email",
+  "cron_utc": "0 5 * * *",
+  "source_of_truth": "routines/01-daily-email.prompt.txt",
+  "fragments": [
+    "daily/preamble",
+    "daily/single-writer-thread-ownership",
+    "daily/scope-pre-filter",
+    "shared/copperhelm-blurb",
+    "shared/call-context-always-read-the-full-transcript-nev",
+    "shared/investor-intro-threads-are-prospects",
+    "daily/post-call-reconciliation",
+    "shared/gate-flag-only-if-all-pass",
+    "shared/ready-to-archive-tagging",
+    "daily/noise-sweep",
+    "daily/invites-and-personal-fyi",
+    "shared/buckets",
+    "shared/self-addressed-notes-leads-i-met",
+    "shared/never-flag",
+    "shared/urgency",
+    "shared/gone-dark",
+    "shared/drafts",
+    "shared/self-check",
+    "daily/output",
+    "shared/month-audit-fix-batch",
+    "daily/workload-split-priority-batch"
+  ]
+}

@@ -1,0 +1,22 @@
+
+## CALL CONTEXT - ALWAYS READ THE FULL TRANSCRIPT, NEVER AN AI SUMMARY (2026-08-06, Shimon's rule)
+Whenever a draft needs to reference what was actually said on a call, read the RAW TRANSCRIPT.
+Do NOT build content from AI-synthesized summaries - they compress away the specific words, the
+objection phrasing, and the commitments that make a follow-up land.
+- GRANOLA (preferred source, verbatim): list_meetings to find the meeting, then
+  get_meeting_transcript(meeting_id) for the FULL transcript. Speaker labels: "Me" is Shimon,
+  "Them"/named speakers are the others. NEVER use query_granola_meetings (that is the AI query),
+  and do not settle for get_meetings' AI summary when a transcript exists.
+- GONG: this connector currently exposes NO transcript endpoint - ask_account, ask_deal and
+  generate_brief are summarizers and their own docs say they must not be used to fetch
+  transcripts. So: (a) ALWAYS prefer the Granola transcript for the same meeting when one exists,
+  matching by date + counterparty; (b) if there is no Granola transcript, open the Gong
+  "Call recording and analysis is ready" email for that call and use its full Key points and Next
+  steps sections verbatim as the fallback, and note in the run output that the draft was built
+  from a summary rather than a transcript; (c) do not call ask_account/ask_deal/generate_brief to
+  write draft content - at most use them to identify WHICH account or deal a call belongs to.
+- Never invent detail that is not in the transcript. Quote or closely paraphrase the
+  counterparty's own words where it strengthens the follow-up.
+GATE HOOK: a recorded call confirms a meeting HAPPENED (feeds Gate 1b "meeting booked and already
+happened"). If the transcript shows a concrete commitment Shimon made that is not yet done (send
+pricing / doc / access / intro) -> treat that thread as [ACTION] and draft the delivery.

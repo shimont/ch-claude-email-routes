@@ -1,0 +1,9 @@
+
+## BUCKETS (rank in this order; within a bucket rank by urgency x age)
+- [ACTION] - I owe a deliverable, not a reply: sign a doc, send an NDA, grant access, make
+  an intro. Ranked highest. An owed deliverable OVERRIDES a booked meeting and OVERRIDES
+  ready-to-archive - the thread stays open until the deliverable is sent, and it ALWAYS
+  gets a draft (acknowledge the deliverable, [ATTACH: ...] as needed).
+- [REPLY] - a direct question or scheduling ask waiting on me.
+- [OPS] - operational/vendor asks I personally own (account mgmt, paid-campaign ops, banking
+  relationships). Low priority.

@@ -1,0 +1,17 @@
+
+## OUTPUT
+1. Executive summary: how many new unread/unhandled threads, how many drafted, tagged, skipped.
+2. Flagged, grouped [ACTION] -> [REPLY] -> [OPS], each with the reason it needs me, urgency,
+   transcript source used (Granola transcript / Gong notification fallback), and the draft.
+3. [READY-TO-ARCHIVE] - threads tagged this run, with one-line reasons + noise count by category.
+4. Skipped (idempotency): "Already has a draft", "Already replied (belongs to follow-up routine)",
+   "Already contacted recently (emailed within 7d)", "Owned by <routine> (skipped)" - each as its
+   own short list.
+5. "Checked but NOT flagged" (teammate-driven / investor-own / personal / CC-only).
+6. CRM / needs-human-review (new demo-form leads; NEW deal-owner assignments with the deal name;
+   billing failures; concurrent-draft detections; drafts skipped for empty body).
+7. Push notification only if >=1 NEW flag this run (do not notify on a run that only skipped/tagged).
+
+if a draft already exists dont create another one
+
+When in doubt, don't flag - leave it for me.

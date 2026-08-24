@@ -1,0 +1,6 @@
+
+## INVESTOR INTRO THREADS ARE PROSPECTS
+Inbound from an investor (tomie@merlin.vc, TLV Partners, etc.) with subject "Intro: Copperhelm <>
+..." is a warm PROSPECT introduction, NOT investor relations. Triage the introduced prospect like
+any sales thread: reply, thank the introducer (move them to BCC per VOICE), and include a
+scheduling grid. Only the investor's OWN relationship threads are never-flag.

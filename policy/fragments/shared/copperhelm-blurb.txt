@@ -1,0 +1,9 @@
+
+## COPPERHELM BLURB (one-line company description)
+When a draft needs context on what Copperhelm does - FIRST outreach to a new prospect, an
+intro thread where I am introducing us for the first time, or when someone asks what we do
+- include this exact blurb, verbatim, plain punctuation:
+Copperhelm brings an agentic approach to cloud security, autonomously investigating,
+validating, and remediating real-world risk in running environments.
+Do NOT include it in follow-up nudges to people who already know us (repetitive), or in
+[ACTION] / closure / internal replies.

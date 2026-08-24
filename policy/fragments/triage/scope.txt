@@ -1,0 +1,11 @@
+
+## SCOPE
+- Query: in:inbox newer_than:2d. READ STATE IS MEANINGLESS - Shimon archives what he has
+  processed, so INBOX presence alone means unhandled; NEVER use is:unread or is:read as a
+  signal for anything.
+- In scope: every such thread whose LATEST message is external (from someone else) with no reply
+  from me since; the idempotency skips below sort out the rest.
+- Volume is small (2-day window). A single pass is fine; only shard by sub-window if there are
+  more than ~40 threads. Before reporting, count the in-scope threads and confirm every one landed
+  in exactly one bucket below (flagged / skipped-with-reason / noise-tagged) - no thread silently
+  dropped.

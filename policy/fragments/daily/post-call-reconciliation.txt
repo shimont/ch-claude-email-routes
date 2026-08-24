@@ -1,0 +1,56 @@
+
+## POST-CALL RECONCILIATION (BLOCKING - closes a class of misses no email scan can catch)
+A call that produced NO email thread is invisible to both the inbox scan and the sent scan -
+there is nothing to scan. Real case (2026-08-06 audit): 12 calls in 10 days had zero follow-up,
+including McKesson (10 days), Keysight and BankUnited (9 days), Lemonade (8 days), and Estee
+Lauder (7 days, two calls the same day).
+EVERY RUN: search from:do-not-reply@gong.io subject:"Call recording and analysis is ready"
+newer_than:14d (page through all pages). For EACH call notification: read the counterparty name,
+company and call timestamp, resolve that person's email from the thread / prior mail / HubSpot,
+then verify a SENT message to them exists AFTER the call timestamp.
+- No sent message after the call AND 1+ business day elapsed -> follow-up is OWED. Open the Gong
+  notification and use its "Key points" and "Next steps" sections as the content, then DRAFT it
+  (subject to every pre-draft gate: threading, draft-exists, calendar, recency, recipient check).
+  A message sent BEFORE the call never counts - check the timestamp, not just the recipient.
+  SUBSTANTIVE ONLY (fixes the Marsh / Dan Bowden miss found 2026-08-08): logistics-only notes -
+  running late, Zoom links, same-day scheduling chatter - do NOT count as the follow-up even when
+  timestamped after the call; the verifying sent message must deliver the actual recap, promised
+  info, or next step.
+- The Copperhelm participant was a teammate, not Shimon -> surface under needs-human-review naming
+  that teammate; do not draft from Shimon's account.
+- Anonymized or broker-run sessions (Sagetap and similar, where the notification carries no
+  identifiable counterparty) -> list under needs-human-review; those get chased in the broker
+  platform, not by email.
+- VENDOR/BROKER OPS CALLS ARE IN SCOPE when SHIMON owes an email action from them (fixes the
+  Execweb/CyberRisk Aug 6 miss: Shimon owed the rejected-leads list and the contract-terms email):
+  classify [OPS] and draft the owed email - 'vendor' never exempts an action Shimon personally
+  committed to on the call.
+- SLACK-CHANNEL DEALS (real cases: Lemonade, GoPuff): when the call's next steps explicitly live in
+  Slack or another non-email channel, do NOT draft an email - list under needs-human-review as
+  'verify in Slack'.
+- CALENDAR-INVITE COMMITMENTS (fixes the Estee Lauder late-January and Elevate Textiles Oct-12
+  misses found 2026-08-08): when the agreed next step is that SHIMON SENDS A CALENDAR INVITE for a
+  specific future date, search Google Calendar for that event; if it does not exist, surface under
+  needs-human-review as 'create invite: <counterparty> <date>' EVERY run while the call is inside
+  the 14d window, and treat it as [ACTION]-class - a far-future date must never read as 'deferred,
+  nothing to do'.
+- BOOKED-MEETING SUPPRESSION (BLOCKING, added 2026-08-09 after the Mercury/Rich Phillips slip):
+  BEFORE drafting any post-call follow-up, search Google Calendar for a FUTURE meeting with that
+  counterparty. If one exists:
+  (a) the call's next steps include a concrete deliverable Shimon owes (scope doc, pricing, access,
+      intro) -> draft ONLY that delivery as a short pre-meeting note. NO scheduling ask, NO slot
+      grid, no "when works for you" - the meeting is already set.
+  (b) nothing is owed -> do NOT draft at all. The booked meeting IS the follow-up; list it under
+      "booked - no draft needed".
+  Real case: the Aug 3 Mercury call's own next steps were "Shimon will send a placeholder invite
+  for Monday at 10 AM" - he did, on Aug 3 - and the routine still drafted a follow-up on Aug 8
+  while that Aug 10 meeting sat on the calendar.
+- HONOR READY-TO-ARCHIVE ON THIS PATH TOO: if the thread you would anchor a post-call draft to is
+  tagged READY-TO-ARCHIVE, do NOT revive it (the Mercury draft landed on a tagged July thread whose
+  last message was a nudge with long-expired slots). Start a fresh thread, or skip.
+- Also sweep Granola meeting notes the same way - the Granola connector IS attached to this routine
+  (added 2026-08-08 after four Granola-only meetings - Insight Partners, SignalFire, Boston
+  Meridian, ICON - went invisible because the prompt referenced a connector the routine did not
+  have); meetings with no Gong recording (in-person, phone) are otherwise invisible too.
+RECONCILE and report: calls found, calls with a verified follow-up, calls drafted this run, calls
+surfaced for a teammate. A call in none of those buckets is a RUN FAILURE.

@@ -1,0 +1,5 @@
+
+## URGENCY
+Set from EMAIL SIGNAL first (seniority/title, "ready to sign/install", repeat chase,
+deadline); HubSpot deals + Gong context secondary. A hot prospect with 0 deals is still hot -
+if a flagged hot account has no deal record, note "consider creating deal" for review.

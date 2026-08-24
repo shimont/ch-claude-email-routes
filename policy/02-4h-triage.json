@@ -1,0 +1,24 @@
+{
+  "routine": "triage",
+  "display_name": "Shimon@copperhelm.com 4h triage",
+  "cron_utc": "0 7,11,14,17 * * *",
+  "source_of_truth": "routines/02-4h-triage.prompt.txt",
+  "fragments": [
+    "triage/preamble",
+    "triage/single-writer-thread-ownership",
+    "triage/scope",
+    "triage/idempotency",
+    "triage/copperhelm-blurb",
+    "triage/call-context-always-read-the-full-transcript-nev",
+    "triage/investor-intro-threads-are-prospects",
+    "triage/gate-decide-the-bucket",
+    "triage/buckets",
+    "triage/never-flag",
+    "triage/ready-to-archive-noise-sweep",
+    "triage/urgency",
+    "triage/drafts",
+    "triage/self-check",
+    "triage/output",
+    "triage/month-audit-fix-batch"
+  ]
+}

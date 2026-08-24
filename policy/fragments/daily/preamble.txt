@@ -1,0 +1,5 @@
+FOLLOW-UP ROUTINE (Shimon Tolts, Copperhelm)
+
+If any of the required connectors (Gmail, Google Calendar, Calendly, HubSpot) doesnt work
+after retrying, stop - dont continue without them. GONG is OPTIONAL enrichment: if only Gong
+is down, continue and write generic drafts; never let a Gong failure stop the run. GRANOLA is likewise OPTIONAL enrichment - if it is down, fall back to the Gong notification emails per CALL CONTEXT.

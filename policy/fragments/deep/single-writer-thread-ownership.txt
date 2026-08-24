@@ -1,0 +1,36 @@
+
+## SINGLE-WRITER THREAD OWNERSHIP (BLOCKING - added 2026-08-17 after two duplicate drafts landed on
+the Martin Stanley / NIST thread 29 seconds apart, anchored to two different parent messages)
+THREE routines write drafts into this one mailbox. Every thread is owned by EXACTLY ONE of them,
+decided by the thread's NEWEST NON-DRAFT message. Resolve that message FIRST, then read the table.
+If this routine does not own the thread, do NOT draft it - list it under "Owned by <routine> (skipped)".
+  Newest non-draft message is INBOUND (external) and under 2 days old   -> 4h triage owns it
+  Newest non-draft message is INBOUND (external) and 2 days or older    -> daily email owns it
+  Newest non-draft message is OUTBOUND (@copperhelm.com), under 7 days  -> daily email owns it
+  Newest non-draft message is OUTBOUND (@copperhelm.com), 7 to 30 days  -> deep sent scan owns it
+Ownership governs WHO DRAFTS. Any routine may still read a thread, tag it READY-TO-ARCHIVE, or
+surface it under needs-human-review - those actions are idempotent and cannot collide.
+HAND-OFF PROTECTION: a thread within ONE business day of crossing a boundary (about to leave your
+band) is promoted to the TOP of the priority order and can never be dropped for budget. Otherwise a
+thread deprioritised in its last days under one routine surfaces only after the next routine's
+slower cadence catches it - the Renaissance / Drew Robertson thread sat 5 business days that way.
+
+Review my inbox for items that need MY follow-up. ALWAYS run as parallel subagents
+sharded by date range.
+  SHARD OWNERSHIP (BLOCKING - added 2026-08-17): when this run is sharded, a thread belongs to
+  exactly the shard whose date window contains its NEWEST NON-DRAFT message. A long thread has
+  messages in several windows, so several shards WILL see it - only one may act. If the newest
+  non-draft message falls outside YOUR shard's window, SKIP the thread entirely; another shard owns
+  it. This is the only thing that actually prevents same-run duplicates: shards run concurrently and
+  cannot see each other's drafts, so the draft-exists gate can never catch them, and the after-the-
+  fact dedupe self-check can only REPORT a duplicate - there is no delete-draft tool, so a duplicate
+  that reaches the mailbox must be removed by hand. Read-only analysis; create drafts only, never send. Apply the
+READY-TO-ARCHIVE label to threads concluded done (see that section) and run the NOISE
+SWEEP at the end.
+SHARD COMPLETENESS (critical): before reporting, run ONE global search (in:inbox
+newer_than:30d) and count threads, AND a second global count for in:sent older_than:7d newer_than:30d (expect
+several hundred - page through them all). Verify the shards' combined processed-thread counts
+reconcile with BOTH totals separately - inbox processed vs inbox total, sent processed vs sent
+total. If any shard errored, returned nothing, or is suspiciously
+thin, RE-RUN that shard - never report success with a missing or partial shard. Past
+runs silently dropped entire date ranges; this check is mandatory.

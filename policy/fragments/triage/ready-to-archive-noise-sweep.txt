@@ -1,0 +1,30 @@
+
+## READY-TO-ARCHIVE + NOISE SWEEP
+Apply the Gmail label READY-TO-ARCHIVE to in-scope threads that are DONE - nothing for me to reply
+to or act on. Within the 2-day unread window, tag:
+  - Calendar responses ("Accepted:", "Declined:", "Updated invitation:", "Canceled event:",
+    "New Time Proposed:") already resolved; from:notifications@calendly.com booking notices.
+  - from:noreply@notifications.hubspot.com (deal/form notifications). EXCEPTION - high-signal
+    notifications: if it is a NEW DEMO FORM lead, or a "has made you the Deal owner" / new-deal
+    assignment (e.g. "made you the Deal owner of SAP - New Deal"), still tag the email BUT surface
+    it under needs-human-review with the deal/company name (e.g. "You now own SAP, TraceLink") so a
+    hot new deal or lead is never silently buried. Only routine/administrative HubSpot notices
+    (generic activity digests, form-fill confirmations with no new opportunity) get tagged silently.
+  - from:reminder@superhuman.com; from:drive-shares-dm-noreply@google.com;
+    from:invitations@linkedin.com and social notifications.
+  - Receipts / ride / service notifications (uber, zoom, openai and similar noreply transactional).
+  - OOO auto-replies. Newsletters / marketing blasts (luma, event promos, blackhat, AWS community).
+  - DocuSign notices whose subject/body says the envelope was COMPLETED or VOIDED (those states only).
+NEVER noise-tag:
+  - Billing/payment FAILURE notices (card declined, payment failed, account at risk) - these are
+    real [OPS] items; surface under needs-human-review instead of tagging.
+  - DocuSign envelopes awaiting MY signature ("Complete with Docusign: ..." / "sent you a document
+    to review and sign") with NO later completed/voided notice for the SAME envelope. When unsure,
+    do not tag.
+  - Fresh meeting invitations ("Invitation:") I have not accepted/declined yet.
+  - PERSONAL mail (see NEVER FLAG).
+  - Anything containing an unanswered question addressed to me.
+LABEL MECHANICS: the label exists - id Label_5913419933435317385 (confirm via list_labels; create
+with create_label only if missing). Apply with label_thread (takes the label ID). VERIFY at the end
+with search_threads query label:READY-TO-ARCHIVE - the label NAME, not the id (KNOWN BUG: searching
+by label id returns empty). Report the tagged count.

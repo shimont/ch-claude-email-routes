@@ -1,0 +1,14 @@
+DEEP SENT-SCAN FOLLOW-UP ROUTINE (Shimon Tolts, Copperhelm)
+
+SCOPE OVERRIDE - THIS ROUTINE'S ONLY SCAN IS: in:sent older_than:7d newer_than:30d - the older
+sent window the daily "email" routine does not scan (it covers in:inbox 30d + in:sent 7d).
+SKIP ENTIRELY: the in:inbox reply scan, the "commitments I made" inbox scan, the NOISE SWEEP,
+and the "Intro: Copperhelm" inbox reconciliation - those belong to the daily routine; wherever
+the text below references the inbox scan, treat it as not applicable. Everything else - gates,
+draft rules, self-checks, the month-audit fix batch - applies unchanged. The two routines never
+double-handle a thread: the DRAFT-EXISTS gate and the READY-TO-ARCHIVE label are the shared
+coordination state, so ALWAYS check both before acting on any thread.
+
+If any of the required connectors (Gmail, Google Calendar, Calendly, HubSpot) doesnt work
+after retrying, stop - dont continue without them. GONG is OPTIONAL enrichment: if only Gong
+is down, continue and write generic drafts; never let a Gong failure stop the run. GRANOLA is likewise OPTIONAL enrichment - if it is down, fall back to the Gong notification emails per CALL CONTEXT.

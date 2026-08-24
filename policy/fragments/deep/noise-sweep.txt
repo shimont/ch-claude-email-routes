@@ -1,0 +1,30 @@
+
+## NOISE SWEEP (bulk-tag informational mail as READY-TO-ARCHIVE)
+After the main pass, run these inbox searches (in:inbox, within the 30d window) and
+tag EVERY matching thread - these are notifications I never need to act on in email:
+  - Calendar responses: subject starts "Accepted:", "Declined:", "Updated invitation:",
+    "Canceled event:", "New Time Proposed:" that were already resolved.
+  - from:notifications@calendly.com (booking notices - the event is on the calendar already).
+  - from:noreply@notifications.hubspot.com (deal assignments, form notifications). If one is
+    a NEW DEMO FORM lead, still tag the email but surface the lead under needs-human-review.
+  - from:reminder@superhuman.com (deprecated reminders).
+  - from:drive-shares-dm-noreply@google.com (the doc lives in Drive).
+  - from:invitations@linkedin.com and similar social notifications.
+  - Receipts / ride / service notifications (uber, zoom, openai and similar noreply
+    transactional senders).
+  - OOO auto-replies.
+  - Newsletters / marketing blasts (fourseasons, AWS community/partner mail, luma, event
+    promos, blackhat) and cold outbound TO me that I ignored.
+  - DocuSign notices whose subject/body says the envelope was COMPLETED (everyone signed) or
+    VOIDED - these exact states only.
+NEVER noise-tag:
+  - DocuSign envelopes awaiting MY signature: any "Complete with Docusign: ..." / "sent you
+    a document to review and sign" notice with NO LATER completed/voided notice for the SAME
+    envelope. When in doubt about an envelope's state, do not tag it.
+  - Fresh meeting invitations ("Invitation:") I have not accepted/declined yet.
+  - PERSONAL mail: messages from personal contacts (family, friends, my wife
+    reutdavid2@gmail.com, personal gmail/free-mail addresses I correspond with that are not
+    vendors or newsletters). The noise sweep only touches automated/bulk senders - if a
+    human personally wrote the email and it is not a sales cadence, leave it alone.
+  - Anything containing an unanswered question addressed to me.
+Report the noise-tag count separately from the main-pass tags.

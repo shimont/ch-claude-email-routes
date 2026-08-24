@@ -1,0 +1,35 @@
+
+MONTH-AUDIT FIX BATCH (2026-08-02) - added after a full 30-day audit (388 sent threads + inbox + drafts, every page) found 25 missed follow-ups, 4 unhandled inbound asks, and several threads nudged 4-6 times while others got zero. These are BLOCKING rules like everything above:
+
+1. WE-SENT-LAST INCLUDES TEAMMATES: outbound from ANY @copperhelm.com address (reutd@, eyar@, roman@) counts as "we sent last, awaiting an external reply" - such threads STAY IN SCOPE (real misses: Myke Lyons advisor agreement, Pieter van Iperen agreement, Security Unfiltered podcast reschedule - all sent by Reut, all went silent untracked). When a teammate sent last, do NOT auto-draft from Shimon's account; surface under needs-human-review ("ping <teammate> or nudge personally").
+
+2. EXPIRED-SLOTS TRIGGER: if our last outbound offered specific time slots and ALL offered dates have passed with no reply, that is an IMMEDIATE follow-up trigger - draft a nudge with FRESH slots right away, regardless of other cadence gates (real misses: REI/Gary, Clover/Chris, Mercury/Rich, Global Credit Union/Dana - all had Jul 27-30 slot grids expire silently).
+
+3. EVENT-DEADLINE ESCALATION: an ask tied to a dated event (a conference like Black Hat, or a window the counterparty named) ESCALATES as the event approaches instead of aging out - within 7 days of the event the nudge gate shrinks to 1 business day, and such threads NEVER age out or hit the nudge cap before the event passes (real misses: Eitav/AWS Black Hat meeting sat 26 days and nearly aged out days before Black Hat; John Yeoh/CSA Black Hat meetup).
+
+4. SELF-PROPOSED WINDOW = SCHEDULED RE-ENGAGEMENT: if we proposed a future window ("does the first week of August work?"), the arrival of that window is itself a follow-up trigger - draft when the window opens (real miss: Amy Chaney - the window arrived and nothing fired).
+
+5. NUDGE COUNTING, BOTH DIRECTIONS: (a) the 7-nudge terminal cap counts CUMULATIVE unanswered nudges across the WHOLE thread history AND across sibling threads to the same counterparty - count them BEFORE drafting, every run; the audit found threads that received 4-6 nudges while others got zero. (b) Situational messages are NOT nudges: executing an agreed plan, rescheduling after a no-show, or sending a doc someone asked for do not count toward the cap (real case: Clover/Chris, an engaged CISO who booked and no-showed, nearly terminal-ed off situational messages). (c) Replies that arrive as NEW threads (e.g. calendar "Declined:" subjects) break per-thread counting - always dedupe and count per COUNTERPARTY, not per threadId.
+
+6. INVESTOR SKIP IS EXACTLY TLV PARTNERS + MERLIN, NOTHING MORE: active fundraising-pipeline VCs (New Era, CRV, and any VC currently in diligence) are IN scope, and their deferrals get the standard 10-business-day timer (real miss: New Era/Ziv's "next steps early next week" sat 17 business days untouched during a live Series A). EXCEPTION: a VC who explicitly PASSED is needs-human-review only - never auto-nudge a pass.
+
+7. SOFT-CLOSE WITH A REAL NEXT STEP STAYS IN ROTATION: sends ending "feel free to reach out" or a docs/materials link that still expect a next step are follow-up candidates like any other (real miss: Agoda/Yaron got ZERO nudges in 26 days while lower-value threads got five).
+
+8. DELEGATION IS PENDING, NOT DONE: forwarding an external ask to a teammate (or CC-ing them with "please send X") does NOT close it - the external counterparty is still waiting. Keep the thread open and surface it under needs-human-review until the deliverable visibly shipped on-thread (real misses: AWS/Omer's ACE-opportunities ask forwarded to Roman+Eyar and never answered externally; Automat-IT sponsorship details delegated to Reut with no visible reply).
+
+9. SHIMON'S OWN "ILL GET BACK TO YOU" COMMITMENTS: when Shimon promised an answer ("let me review with my co-founders and come back to you"), HE owes the next message - surface under needs-human-review after 3 business days (real miss: the $5K CSA Startup membership answer owed to Scott Williams while Black Hat approaches).
+
+10. POST-MEETING-DATE CONFIRMATION: when a proposed or booked meeting date passes with no confirmation, no reschedule, and no sign it happened, check the calendar; if it was never confirmed or looks like a no-show, draft a light reschedule note (real case: Eran/BofA - booked unilaterally for Jul 30, date passed in silence).
+
+11. CLOSED-LOOP LANGUAGE = TERMINAL: "decided not to move forward", "not at this time", "went with another vendor" and similar polite passes are terminal - tag READY-TO-ARCHIVE, never nudge.
+
+12. RECIPIENT VALIDATION BEFORE SAVING ANY DRAFT: the greeting name must match the actual recipient, and the recipient must never be an @copperhelm.com address (real slips: a nudge addressed to shimon@copperhelm.com instead of Hardik; a "Hey Rick" email sent to Praveen Verma at Autodesk that likely went unanswered for exactly that reason). If the thread being nudged itself contains a greeting/recipient mismatch, flag it under needs-human-review instead of nudging into the confusion.
+
+13. INTERNAL TASK THREADS WITH EXTERNAL DEADLINES: internal @copperhelm.com-only threads are normally out of scope, but when one carries an external deadline or dependency (e.g. the AWS PRM integration required to keep AWS partner benefits), surface it under needs-human-review once it stalls more than 5 business days - do not draft.
+
+14. POST-EVENT REFRAME (added 2026-08-08): when a pending ask was scoped to an event that has
+since passed ('pick a time while we're in Vegas', Black Hat-week slot grids), a plain nudge or
+resend is WRONG - the premise expired with the event. Draft a REFRAMED follow-up on a fresh
+premise, or when the thread is teammate-driven surface it under needs-human-review (real cases:
+Bryant/UnitedHealth reschedule, John Yeoh/CSA meetup, Capital Group BH connect - all sat on dead
+Black Hat premises on 2026-08-08).
