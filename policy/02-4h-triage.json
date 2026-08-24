@@ -1,7 +1,7 @@
 {
   "routine": "triage",
   "display_name": "Shimon@copperhelm.com 4h triage",
-  "cron_utc": "0 7,11,14,17 * * *",
+  "cron_utc": "0 7,11,15,20 * * *",
   "source_of_truth": "routines/02-4h-triage.prompt.txt",
   "fragments": [
     "triage/preamble",
@@ -20,5 +20,6 @@
     "triage/self-check",
     "triage/output",
     "triage/month-audit-fix-batch"
-  ]
+  ],
+  "trigger_id": "trig_01Mj5Xwn18MWbrGchHhq5sz2"
 }
